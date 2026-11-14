@@ -1,0 +1,1429 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Apex Hub CRM</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0b0d10">
+<link rel="icon" href="img/icone-32.png">
+<link rel="apple-touch-icon" href="img/icone-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Apex Hub">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde:#3b6ea8;--verde-2:#2f5a8c;--verde-claro:#e8eef7;
+  --enrico:#3b6ea8;--enrico-claro:#e8eef7;--otavio:#2563eb;--otavio-claro:#e3ecfd;
+  --bg:#f4f5f7;--card:#ffffff;--card-2:#f8f9fb;--txt:#15181d;--txt-2:#5a616c;--txt-3:#8a919c;--linha:#e2e5ea;
+  --alerta:#c2410c;--alerta-claro:#fff1e7;--ok:#15803d;--sombra:0 1px 2px rgba(16,24,20,.06),0 4px 16px rgba(16,24,20,.06);
+  --raio:12px;color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --verde:#4d80c4;--verde-2:#6f9fd6;--verde-claro:#17202c;--enrico:#4d80c4;--enrico-claro:#17202c;--otavio:#4f86f7;--otavio-claro:#16233f;
+  --bg:#0b0d10;--card:#14171b;--card-2:#191d22;--txt:#eceef1;--txt-2:#a7aeb8;--txt-3:#747c87;--linha:#262b32;--alerta:#fb923c;--alerta-claro:#33200f;--ok:#4ade80;--sombra:0 1px 2px rgba(0,0,0,.3);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --verde:#4d80c4;--verde-2:#6f9fd6;--verde-claro:#17202c;--enrico:#4d80c4;--enrico-claro:#17202c;--otavio:#4f86f7;--otavio-claro:#16233f;
+  --bg:#0b0d10;--card:#14171b;--card-2:#191d22;--txt:#eceef1;--txt-2:#a7aeb8;--txt-3:#747c87;--linha:#262b32;--alerta:#fb923c;--alerta-claro:#33200f;--ok:#4ade80;--sombra:0 1px 2px rgba(0,0,0,.3);color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--txt);font:14px/1.45 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--verde)}
+h1,h2,h3{margin:0;font-weight:700;letter-spacing:-.01em}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);background:var(--card);border-radius:9px;padding:7px 12px;cursor:pointer;font-weight:500;white-space:nowrap;text-decoration:none;color:var(--txt)}
+.btn:hover{border-color:var(--txt-3)}
+.btn.pri{background:var(--verde);border-color:var(--verde);color:#fff}
+.btn.pri:hover{background:var(--verde-2)}
+.btn.peq{padding:4px 9px;font-size:12.5px;border-radius:7px}
+.btn.fant{border-color:transparent;background:transparent}
+.btn.fant:hover{background:var(--card-2)}
+.btn.perigo{color:var(--enrico)}
+.btn:disabled{opacity:.55;cursor:default}
+input.campo,select.campo,textarea.campo{width:100%;border:1px solid var(--linha);background:var(--card);border-radius:9px;padding:8px 10px;outline:none}
+input.campo:focus,select.campo:focus,textarea.campo:focus{border-color:var(--verde);box-shadow:0 0 0 3px color-mix(in srgb,var(--verde) 18%,transparent)}
+textarea.campo{resize:vertical;min-height:70px}
+label.rot{display:block;font-size:12px;font-weight:600;color:var(--txt-2);margin:0 0 4px}
+.grade{display:grid;gap:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}
+@media (max-width:640px){.g2,.g3{grid-template-columns:1fr}}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--card-2);border:1px solid var(--linha);color:var(--txt-2);white-space:nowrap}
+.chip.verde{background:var(--verde-claro);border-color:transparent;color:var(--verde)}
+.chip.alerta{background:var(--alerta-claro);border-color:transparent;color:var(--alerta)}
+.ponto{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+.av{width:24px;height:24px;border-radius:50%;display:inline-grid;place-items:center;font-size:11px;font-weight:700;color:#fff;flex:none}
+.av.ambos{background:linear-gradient(90deg,var(--enrico) 50%,var(--otavio) 50%)}
+.vazio{color:var(--txt-3);text-align:center;padding:22px 10px;font-size:13px}
+.muted{color:var(--txt-2)}.peq{font-size:12.5px}
+
+/* login */
+#login{min-height:100%;display:grid;place-items:center;padding:24px 16px;background:radial-gradient(1200px 500px at 50% -10%,var(--verde-claro),transparent),var(--bg)}
+.login-box{width:100%;max-width:380px;background:var(--card);border:1px solid var(--linha);border-radius:18px;padding:28px 24px;box-shadow:var(--sombra)}
+.login-box img{height:96px;width:96px;border-radius:22px;background:#000;display:block;margin:0 auto 6px;object-fit:cover}
+.login-box h1{text-align:center;font-size:15px;color:var(--txt-2);font-weight:500;margin-bottom:20px}
+.erro{color:var(--enrico);font-size:13px;min-height:18px;margin:8px 0 0}
+
+/* app */
+#app{display:grid;grid-template-columns:232px 1fr;min-height:100%}
+aside{background:var(--card);border-right:1px solid var(--linha);padding:16px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+aside .logo{display:flex;align-items:center;gap:8px;padding:4px 8px 14px}
+aside .logo img{height:34px;width:34px;border-radius:9px;background:#000;object-fit:cover}
+aside .logo .nm{font:800 17px/1 Montserrat,sans-serif;letter-spacing:-.01em;color:var(--txt)}aside .logo .nm span{color:var(--verde)}
+aside .logo b{font:800 11px Montserrat,sans-serif;letter-spacing:.08em;color:var(--txt-3);text-transform:uppercase;margin-top:6px}
+.nav{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;color:var(--txt-2);font-weight:500;border:0;background:none;width:100%;text-align:left}
+.nav:hover{background:var(--card-2);color:var(--txt)}
+.nav.ativo{background:var(--verde-claro);color:var(--verde);font-weight:600}
+.nav svg{width:18px;height:18px;flex:none}
+.nav .cont{margin-left:auto;font-size:11px;font-weight:700;background:var(--verde);color:#fff;border-radius:99px;padding:1px 7px}
+aside .rodape{margin-top:auto;display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--linha);padding-top:12px}
+.eu{display:flex;align-items:center;gap:8px;padding:4px 6px}
+main{min-width:0;display:flex;flex-direction:column}
+.topo{display:flex;align-items:center;gap:10px;padding:12px 22px;border-bottom:1px solid var(--linha);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);position:sticky;top:0;z-index:20;flex-wrap:wrap}
+.topo h2{font-size:19px;margin-right:auto}
+.busca-btn{display:flex;align-items:center;gap:8px;min-width:220px;color:var(--txt-3)}
+.busca-btn kbd{margin-left:auto;font:600 11px Inter;border:1px solid var(--linha);border-radius:5px;padding:0 5px}
+#conteudo{padding:20px 22px 60px;flex:1}
+.demo-faixa{background:#fff7d6;color:#6b5200;border-bottom:1px solid #f0dc8a;padding:7px 22px;font-size:12.5px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+:root[data-theme="dark"] .demo-faixa{background:#2b2408;color:#f3dc85;border-color:#4a3d0c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .demo-faixa{background:#2b2408;color:#f3dc85;border-color:#4a3d0c}}
+.menu-mob{display:none}
+@media (max-width:900px){
+  #app{grid-template-columns:1fr}
+  aside{position:fixed;inset:0 auto 0 0;width:260px;z-index:60;transform:translateX(-100%);transition:transform .2s;box-shadow:var(--sombra)}
+  aside.aberto{transform:none}
+  .menu-mob{display:inline-flex}
+  .topo{padding:10px 16px}#conteudo{padding:16px 16px 70px}.demo-faixa{padding:7px 16px}
+  .busca-btn{min-width:0}.busca-btn span,.busca-btn kbd{display:none}
+}
+.cartao{background:var(--card);border:1px solid var(--linha);border-radius:var(--raio);box-shadow:var(--sombra)}
+.cartao>.cab{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--linha)}
+.cartao>.cab h3{font-size:14px;margin-right:auto}
+.lista-itens>*{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--linha);cursor:pointer}
+.lista-itens>*:last-child{border-bottom:0}
+.lista-itens>*:hover{background:var(--card-2)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi{padding:14px 16px}
+.kpi small{display:block;color:var(--txt-2);font-size:12px;font-weight:500}
+.kpi b{font-size:26px;font-weight:700;letter-spacing:-.02em;display:block;margin-top:2px}
+.kpi.alerta b{color:var(--alerta)}
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+.filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.filtros select.campo,.filtros input.campo{width:auto;min-width:130px;padding:6px 9px}
+.seg{display:inline-flex;border:1px solid var(--linha);border-radius:9px;overflow:hidden;background:var(--card)}
+.seg button{border:0;background:none;padding:6px 11px;cursor:pointer;color:var(--txt-2);font-weight:500}
+.seg button.ativo{background:var(--verde-claro);color:var(--verde);font-weight:600}
+
+/* kanban */
+.quadro{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(250px,1fr);gap:12px;overflow-x:auto;padding-bottom:8px;align-items:start}
+.coluna{background:var(--card-2);border:1px solid var(--linha);border-radius:var(--raio);display:flex;flex-direction:column;max-height:calc(100vh - 190px);min-height:120px}
+.coluna.sobre{outline:2px dashed var(--verde);outline-offset:-3px}
+.coluna>header{display:flex;align-items:center;gap:7px;padding:10px 12px;font-weight:600;font-size:13px}
+.coluna>header small{color:var(--txt-3);font-weight:500;margin-left:auto}
+.coluna .itens{padding:0 8px 8px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.lead{background:var(--card);border:1px solid var(--linha);border-radius:10px;padding:10px 11px;cursor:pointer;box-shadow:0 1px 1px rgba(0,0,0,.03)}
+.lead:hover{border-color:var(--txt-3)}
+.lead.arrastando{opacity:.5}
+.lead .nome{font-weight:600;display:flex;gap:6px;align-items:center}
+.lead .nome span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lead .sub{color:var(--txt-2);font-size:12.5px;margin:2px 0 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lead .pe{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.lead .mover{margin-left:auto;display:none}
+@media (hover:none),(max-width:900px){.lead .mover{display:inline-flex}}
+table.tab{width:100%;border-collapse:collapse;font-size:13px}
+.tab th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--txt-3);font-weight:600;padding:9px 12px;border-bottom:1px solid var(--linha);background:var(--card-2);position:sticky;top:0}
+.tab td{padding:9px 12px;border-bottom:1px solid var(--linha);vertical-align:middle}
+.tab tr:hover td{background:var(--card-2);cursor:pointer}
+.rolagem{overflow-x:auto}
+
+/* tarefas */
+.obj-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;align-items:start}
+.obj{background:var(--card);border:1px solid var(--linha);border-radius:var(--raio);padding:16px;display:grid;gap:8px;cursor:pointer;transition:border-color .15s,transform .15s}
+.obj:hover{border-color:var(--txt-3);transform:translateY(-1px)}
+.obj h3{font-size:16px}.obj p{margin:0;color:var(--txt-2)}
+.obj .pe{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
+.obj .barra{height:5px;border-radius:9px;background:var(--linha);overflow:hidden}.obj .barra i{display:block;height:100%;background:var(--verde);border-radius:9px}
+.obj.feito{opacity:.75}.obj.feito h3{text-decoration:line-through;text-decoration-color:var(--txt-3)}
+.obj.vencido .barra i{background:#d9534f}
+.aviso-priv{display:inline-flex;align-items:center;gap:6px;color:var(--txt-2);font-size:13px}
+.tquadro{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+@media (max-width:1000px){.tquadro{grid-template-columns:1fr}}
+.tcol{border-radius:var(--raio);border:1px solid var(--linha);background:var(--card)}
+.tcol>header{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:3px solid var(--cor);border-radius:var(--raio) var(--raio) 0 0;background:color-mix(in srgb,var(--cor) 8%,var(--card))}
+.tcol>header h3{font-size:15px}
+.tcol>header small{margin-left:auto;color:var(--txt-2)}
+.tcol .nova{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--linha)}
+.tcol .nova input{padding:6px 9px}
+.tarefa{display:flex;gap:10px;padding:11px 12px;border-bottom:1px solid var(--linha);align-items:flex-start}
+.tarefa:last-child{border-bottom:0}
+.tarefa.feita .tt{text-decoration:line-through;color:var(--txt-3)}
+.marca{appearance:none;-webkit-appearance:none;width:20px;height:20px;border-radius:6px;border:2px solid var(--cor,var(--txt-3));margin:1px 0 0;cursor:pointer;flex:none;display:grid;place-items:center;background:var(--card)}
+.marca:checked{background:var(--cor,var(--verde))}
+.marca:checked::after{content:"";width:6px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.tarefa .corpo{flex:1;min-width:0}
+.tarefa .tt{font-weight:500;cursor:pointer;word-break:break-word}
+.tarefa .meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;align-items:center}
+.tarefa .acoes{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap}
+.cor-agora{--cor:#d9534f}.cor-semana{--cor:var(--verde)}.cor-depois{--cor:#8a919c}.cor-enrico{--cor:var(--enrico)}.cor-otavio{--cor:var(--otavio)}.cor-ambos{--cor:#7c3aed}
+.tcol.cor-ambos>header{border-image:linear-gradient(90deg,var(--enrico),var(--otavio)) 1;border-bottom-width:3px;border-bottom-style:solid}
+.marca.ambos{border-color:transparent;background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(90deg,var(--enrico),var(--otavio)) border-box}
+.marca.ambos:checked{background:linear-gradient(90deg,var(--enrico),var(--otavio))}
+
+/* painel lateral e modais */
+.veu{position:fixed;inset:0;background:rgba(10,14,12,.45);z-index:80;display:flex;justify-content:flex-end}
+.veu.centro{justify-content:center;align-items:flex-start;padding:8vh 16px 16px}
+.gaveta{width:min(640px,100%);height:100%;background:var(--bg);overflow-y:auto;box-shadow:-10px 0 30px rgba(0,0,0,.15);display:flex;flex-direction:column}
+.gaveta>header{display:flex;align-items:flex-start;gap:10px;padding:16px 18px;background:var(--card);border-bottom:1px solid var(--linha);position:sticky;top:0;z-index:2}
+.gaveta>header h2{font-size:18px;word-break:break-word}
+.gaveta .miolo{padding:16px 18px 40px;display:flex;flex-direction:column;gap:14px}
+.modal{width:min(560px,100%);background:var(--card);border:1px solid var(--linha);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.25);max-height:84vh;overflow:auto}
+.modal>header{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--linha)}
+.modal>header h3{margin-right:auto;font-size:16px}
+.modal .miolo{padding:16px;display:flex;flex-direction:column;gap:12px}
+.modal footer{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--linha)}
+.x{border:0;background:none;cursor:pointer;font-size:22px;line-height:1;color:var(--txt-3);padding:2px 6px;border-radius:6px}
+.x:hover{background:var(--card-2);color:var(--txt)}
+.rapidos{display:flex;gap:6px;flex-wrap:wrap}
+.linha-tempo{display:flex;flex-direction:column}
+.evento{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--linha)}
+.evento:last-child{border-bottom:0}
+.evento .ic{width:28px;height:28px;border-radius:50%;background:var(--card-2);border:1px solid var(--linha);display:grid;place-items:center;flex:none;font-size:13px}
+.evento .tx{white-space:pre-wrap;word-break:break-word}
+.secao{background:var(--card);border:1px solid var(--linha);border-radius:var(--raio);padding:14px}
+.secao>h3{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--txt-3);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.secao>h3 .btn{margin-left:auto;text-transform:none;letter-spacing:0}
+.busca-res>*{padding:9px 12px;border-radius:8px;cursor:pointer;display:flex;gap:10px;align-items:center}
+.busca-res>*:hover,.busca-res>.sel{background:var(--verde-claro)}
+.email-corpo{white-space:pre-wrap;word-break:break-word;background:var(--card-2);border:1px solid var(--linha);border-radius:10px;padding:12px;max-height:50vh;overflow:auto}
+.nlido{font-weight:700}
+.nlido::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--verde);margin-right:6px;vertical-align:middle}
+#toasts{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:200;width:min(420px,calc(100% - 32px))}
+.toast{background:#17201b;color:#fff;border-radius:10px;padding:10px 14px;box-shadow:0 8px 24px rgba(0,0,0,.25);display:flex;gap:10px;align-items:center;animation:sobe .2s}
+.toast.erro{background:#991b1b}
+.toast button{margin-left:auto;background:none;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:7px;padding:3px 9px;cursor:pointer}
+@keyframes sobe{from{transform:translateY(8px);opacity:0}}
+.check-it{display:flex;gap:8px;align-items:center;padding:4px 0}
+.check-it input[type=text]{flex:1}
+.carregando{display:grid;place-items:center;min-height:60vh;color:var(--txt-3)}
+.giro{width:26px;height:26px;border:3px solid var(--linha);border-top-color:var(--verde);border-radius:50%;animation:gira .8s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.st{width:30px;height:30px;border-radius:50%;border:2px solid var(--txt-3);background:var(--card);cursor:pointer;flex:none;display:grid;place-items:center;font-weight:800;font-size:15px;color:#fff;padding:0}
+.st:hover{border-color:var(--ok)}
+.st-feito{background:var(--ok);border-color:var(--ok)}
+.st-duvida{background:#f59e0b;border-color:#f59e0b}
+.trilha{display:flex;align-items:center;gap:2px;flex-wrap:wrap;min-width:0}
+.pastas-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-bottom:16px}
+.pasta{display:flex;gap:12px;padding:14px;cursor:pointer;align-items:flex-start}
+.pasta:hover{border-color:var(--txt-3)}
+.pasta-corpo{flex:1;min-width:0}
+.pasta-nome{font-weight:600;word-break:break-word;margin-bottom:2px}
+.barra{height:6px;background:var(--card-2);border-radius:9px;overflow:hidden;margin:8px 0 3px}
+.barra>div{height:100%;background:var(--ok)}
+.soltar{display:flex;flex-direction:column;align-items:center;gap:4px;border:2px dashed var(--linha);border-radius:var(--raio);padding:18px;cursor:pointer;background:var(--card);text-align:center}
+.soltar:hover,.soltar.sobre{border-color:var(--verde);background:var(--verde-claro)}
+.arqs-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+@media (max-width:640px){.arqs-grade{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
+.arq{overflow:hidden;display:flex;flex-direction:column}
+.arq.feito .thumb>img,.arq.feito .thumb>video{opacity:.55}
+.thumb{position:relative;aspect-ratio:9/12;background:var(--card-2);display:grid;place-items:center;cursor:pointer;overflow:hidden}
+.thumb img,.thumb video{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .ic-arq{font-size:44px}
+.thumb .play{position:absolute;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center;font-size:15px}
+.selo{position:absolute;top:8px;left:8px;background:var(--ok);color:#fff;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:99px}
+.selo.duv{background:#f59e0b}
+.arq-pe{display:flex;gap:8px;align-items:center;padding:9px 10px}
+.arq-nome{font-weight:500;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.veu.escuro{background:rgba(5,8,6,.97);padding:0;align-items:stretch}
+.visor{width:100%;height:100%;display:flex;flex-direction:column;color:#fff;position:relative}
+.visor>header{display:flex;gap:10px;align-items:center;padding:12px 14px}
+.visor .x{color:#fff}
+.visor-midia{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:0 12px;overflow:hidden}
+body:has(.visor) #toasts{bottom:auto;top:16px}
+.visor-acoes{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+@media (max-width:640px){.visor-acoes .rot-m{display:none}.visor-acoes .btn{padding:8px 11px}}
+.visor-midia img,.visor-midia video{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
+.visor-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:64px;border:0;border-radius:10px;background:rgba(255,255,255,.12);color:#fff;font-size:34px;cursor:pointer}
+.visor-nav.ant{left:10px}.visor-nav.prox{right:10px}
+.visor-pe{display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 14px calc(14px + env(safe-area-inset-bottom))}
+.visor-pe .seg{background:#1b211d;border-color:#333}.visor-pe .seg button{color:#cfd6d1}
+.visor-pe .seg button.ativo{background:#14532d;color:#fff}
+.visor-pe .btn{background:#1b211d;border-color:#333;color:#fff}.visor-pe .btn.pri{background:var(--verde);border-color:var(--verde)}
+.visor-pe .btn.perigo{color:#fca5a5}
+@media (max-width:640px){.visor-nav{display:none}}
+.ia-painel{position:fixed;right:16px;bottom:16px;width:min(420px,calc(100% - 32px));height:min(560px,calc(100vh - 32px));background:var(--card);border:1px solid var(--linha);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.25);z-index:90;display:flex;flex-direction:column}
+.ia-painel>header{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--linha);flex-wrap:wrap}
+.ia-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.ia-b{max-width:88%;padding:9px 12px;border-radius:14px;line-height:1.45;word-break:break-word}
+.ia-b.eu{align-self:flex-end;background:var(--verde);color:#fff;border-bottom-right-radius:4px}
+.ia-b.ia{align-self:flex-start;background:var(--card-2);border:1px solid var(--linha);border-bottom-left-radius:4px}
+.ia-dica{color:var(--txt-2);font-size:13px;line-height:1.7;background:var(--card-2);border-radius:12px;padding:10px 12px}
+.ia-form{display:flex;gap:8px;padding:10px;border-top:1px solid var(--linha);align-items:flex-end}
+.ia-form textarea{resize:none;min-height:44px}
+@media (max-width:640px){.ia-painel{right:0;bottom:0;width:100%;height:100%;border-radius:0}}
+.grade-ph td{min-width:120px;cursor:text}
+.grade-ph td:last-child{min-width:0}
+.senha-cel{display:inline-flex;align-items:center;gap:2px}
+.senha-cel code{font:inherit;color:inherit;background:none;padding:0}
+.codigo{font:12px/1.5 ui-monospace,Menlo,monospace;background:var(--card-2);border:1px solid var(--linha);border-radius:9px;padding:10px;white-space:pre-wrap;word-break:break-all}
+</style>
+<script src="config.js"></script>
+<script src="crm-api.js"></script>
+</head>
+<body>
+<div id="inicio" class="carregando"><div class="giro"></div></div>
+
+<section id="login" hidden>
+  <form class="login-box" id="fLogin" autocomplete="on">
+    <img src="img/logo.png" alt="Apex Hub">
+    <h1>Apex Hub CRM</h1>
+    <div class="grade">
+      <div><label class="rot" for="lEmail">E-mail</label><input class="campo" id="lEmail" type="email" autocomplete="username" required></div>
+      <div id="blSenha"><label class="rot" for="lSenha">Senha</label><input class="campo" id="lSenha" type="password" autocomplete="current-password" required></div>
+      <button class="btn pri" id="lBtn" style="justify-content:center;padding:10px">Entrar</button>
+      <button type="button" class="btn fant peq" id="lEsqueci" style="justify-content:center">Esqueci a senha</button>
+    </div>
+    <p class="erro" id="lErro" role="alert"></p>
+  </form>
+  <form class="login-box" id="fNova" hidden>
+    <img src="img/logo.png" alt="Apex Hub">
+    <h1>Crie uma nova senha</h1>
+    <div class="grade">
+      <div><label class="rot" for="nSenha">Nova senha (mínimo 8 caracteres)</label><input class="campo" id="nSenha" type="password" minlength="8" autocomplete="new-password" required></div>
+      <button class="btn pri" style="justify-content:center;padding:10px">Salvar senha</button>
+    </div>
+    <p class="erro" id="nErro" role="alert"></p>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <aside id="lado">
+    <div class="logo"><img src="img/marca.png" alt=""><span class="nm">Apex<span>Hub</span></span><b>CRM</b></div>
+    <button class="nav" data-v="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1z"/></svg>Início</button>
+    <button class="nav" data-v="leads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7M16 4a4 4 0 010 8M22 21c0-3-2-6-5-7"/></svg>Leads e clientes<span class="cont" id="cLeads" hidden></span></button>
+    <button class="nav" data-v="tarefas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 12l3 3 5-6"/></svg>Tarefas<span class="cont" id="cTarefas" hidden></span></button>
+    <button class="nav" data-v="lembretes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3L2 6M19 3l3 3"/></svg>Lembretes<span class="cont" id="cLemb" hidden></span></button>
+    <button class="nav" data-v="trabalhos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Trabalhos</button>
+    <button class="nav" data-v="projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>Projetos</button>
+    <button class="nav" data-v="objetivos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Meus objetivos</button>
+    <button class="nav" data-v="pastas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 14l2 2 4-4"/></svg>Pastas<span class="cont" id="cPastas" hidden></span></button>
+    <button class="nav" data-v="formularios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg>Formulários</button>
+    <button class="nav" data-v="emails"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>E-mails<span class="cont" id="cEmails" hidden></span></button>
+    <button class="nav" data-v="conectar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 14a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1M14 10a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg>Conectar projetos</button>
+    <div class="rodape">
+      <button class="btn peq" id="bLinkForm">🔗 Copiar link do formulário</button>
+      <div style="display:flex;gap:6px">
+        <button class="btn peq fant" id="bTema" title="Tema claro/escuro">◐ Tema</button>
+        <button class="btn peq fant" id="bSair">Sair</button>
+      </div>
+      <div class="eu" id="euBox"></div>
+    </div>
+  </aside>
+  <main>
+    <div class="demo-faixa" id="faixaDemo" hidden>
+      <b>Modo prévia</b> · dados de exemplo salvos só neste navegador. Para usar de verdade, preencha o config.js (veja o LEIA-ME).
+      <button class="btn peq" id="bResetDemo">Recomeçar exemplo</button>
+    </div>
+    <div class="topo">
+      <button class="btn menu-mob" id="bMenu" aria-label="Menu">☰</button>
+      <h2 id="titulo">Início</h2>
+      <select class="campo" id="selUnidade" style="width:auto" aria-label="Unidade"></select>
+      <button class="btn busca-btn" id="bBusca"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
+      <button class="btn" id="bIA" title="Assistente de IA">✨ IA</button>
+      <button class="btn pri" id="bNovo">+ Novo</button>
+    </div>
+    <div id="conteudo"></div>
+  </main>
+</div>
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+const A = window.CRM;
+const $ = (s, el = document) => el.querySelector(s), $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const S = { eu: null, equipe: [], unidades: [], contatos: [], tarefas: [], projetos: [], emails: [], pastas: [], arquivos: [], modelos: [], planos: [], lembretes: [], planilhas: [], objetivos: [], planilhaAtual: null, pastaAtual: null, view: 'inicio', unidade: A.local.get('crm-unidade') || 'todas', filtros: {} };
+const ETAPAS = [['novo', 'Novo', '#64748b'], ['em_contato', 'Em contato', '#0ea5e9'], ['proposta', 'Proposta enviada', '#a855f7'], ['negociacao', 'Negociação', '#f59e0b'], ['fechado', 'Fechado', '#16a34a'], ['perdido', 'Perdido', '#9ca3af']];
+const ETAPA = Object.fromEntries(ETAPAS.map(([k, n, c]) => [k, { n, c }]));
+const ORIGENS = { formulario: 'Formulário', email: 'E-mail', manual: 'Manual', instagram: 'Instagram', whatsapp: 'WhatsApp', indicacao: 'Indicação', anuncio: 'Anúncio', outro: 'Outro' };
+const TIPOS = { lead: 'Lead', cliente: 'Cliente', parceiro: 'Parceiro', fornecedor: 'Fornecedor', outro: 'Outro' };
+const INTERESSES = { site: 'Site', cardapio: 'Cardápio digital', sistema: 'Sistema', agente_ia: 'Agente de IA', automacao: 'Automações', loja: 'Loja online', trafego: 'Anúncios', social: 'Social media', video: 'Vídeo', outro: 'Outro' };
+const PSTATUS = [['briefing', 'Briefing'], ['producao', 'Em produção'], ['aprovacao', 'Aprovação'], ['publicado', 'Publicado'], ['manutencao', 'Manutenção'], ['pausado', 'Pausado'], ['cancelado', 'Cancelado']];
+const PTIPOS = { site: 'Site', cardapio: 'Cardápio', sistema: 'Sistema', loja: 'Loja', video: 'Vídeo', social: 'Redes sociais', trafego: 'Tráfego', outro: 'Outro' };
+const ATIPOS = { nota: ['📝', 'Nota'], ligacao: ['📞', 'Ligação'], whatsapp: ['💬', 'WhatsApp'], reuniao: ['🤝', 'Reunião'], email: ['✉️', 'E-mail'], etapa: ['➜', 'Etapa'], tarefa: ['✔', 'Tarefa'], formulario: ['🧾', 'Formulário'], sistema: ['•', 'Sistema'] };
+const hoje = () => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
+const pessoa = (ap) => ap === 'ambos' ? { nome: 'Os dois', cor: '', apelido: 'ambos' } : (S.equipe.find((e) => e.apelido === ap) || null);
+const SOLO = () => S.equipe.filter((e) => e.ativo !== false).length <= 1;
+const outro = (ap) => (S.equipe.find((e) => e.apelido !== ap && e.apelido !== 'ambos') || {}).apelido;
+const avatar = (ap, tam) => { if (!ap) return ''; const p = pessoa(ap); if (!p) return ''; const tm = tam ? `width:${tam}px;height:${tam}px;font-size:${Math.round(tam * .45)}px;` : ''; return ap === 'ambos' ? `<span class="av ambos" style="${tm}" title="Os dois">2</span>` : `<span class="av" title="${esc(p.nome)}" style="${tm}background:${esc(p.cor)}">${esc(p.nome[0])}</span>`; };
+const unidade = (id) => S.unidades.find((u) => u.id === id) || { nome: id || '—', cor: '#999' };
+const chipUnidade = (id) => { const u = unidade(id); return `<span class="chip"><span class="ponto" style="background:${esc(u.cor)}"></span>${esc(u.nome)}</span>`; };
+const moeda = (v, m = 'BRL') => v == null || v === '' ? '' : Number(v).toLocaleString(m === 'BRL' ? 'pt-BR' : m === 'EUR' ? 'pt-PT' : 'en-US', { style: 'currency', currency: m, maximumFractionDigits: 0 });
+const data = (s, hora) => { if (!s) return ''; const d = new Date(s.length === 10 ? s + 'T12:00:00' : s); return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', ...(hora ? { hour: '2-digit', minute: '2-digit' } : {}) }).replace('.', ''); };
+const relativo = (s) => { const m = (Date.now() - new Date(s)) / 6e4; if (m < 1) return 'agora'; if (m < 60) return Math.round(m) + ' min'; if (m < 1440) return Math.round(m / 60) + ' h'; if (m < 10080) return Math.round(m / 1440) + ' d'; return data(s); };
+const prazoChip = (p, feita) => { if (!p) return ''; const h = hoje(); if (feita) return `<span class="chip">${data(p)}</span>`; if (p < h) return `<span class="chip alerta">Atrasada · ${data(p)}</span>`; if (p === h) return `<span class="chip verde">Hoje</span>`; return `<span class="chip">${data(p)}</span>`; };
+const doFiltroUnidade = (x) => S.unidade === 'todas' || x.unidade === S.unidade;
+const hashAtual = () => { try { return location.hash.slice(1); } catch { return ''; } };
+const trocarEndereco = (u) => { try { history.replaceState(null, '', u); } catch {} };
+const telLimpo = (t) => String(t || '').replace(/\D/g, '');
+
+function toast(msg, tipo, acao) {
+  const t = document.createElement('div'); t.className = 'toast' + (tipo === 'erro' ? ' erro' : ''); t.innerHTML = `<span>${esc(msg)}</span>`;
+  if (acao) { const b = document.createElement('button'); b.textContent = acao.rot; b.onclick = () => { acao.fn(); t.remove(); }; t.appendChild(b); }
+  const caixa = $('#toasts'); caixa.appendChild(t); while (caixa.children.length > 3) caixa.firstElementChild.remove(); setTimeout(() => t.remove(), acao ? 7000 : 3000);
+}
+const falha = (e) => { console.error(e); toast(A.mensagem(e), 'erro'); };
+
+// ---------- tema ----------
+function aplicarTema(t) { if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; }
+aplicarTema(A.local.get('crm-tema'));
+$('#bTema').onclick = () => { const atual = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); const n = atual === 'dark' ? 'light' : 'dark'; A.local.set('crm-tema', n); aplicarTema(n); };
+
+// ---------- login ----------
+let modoRecuperar = false;
+async function iniciar() {
+  try {
+    if (/[?&]nova=1/.test(location.search) || /type=recovery/.test(location.hash)) { await esperarSessaoRecuperacao(); mostrar('nova'); return; }
+    const s = await A.sessao();
+    if (!s) return mostrar('login');
+    await carregarTudo(); mostrar('app');
+  } catch (e) { console.error(e); if (A.codigo(e) === 'sem_acesso') { await A.sair(); mostrar('login'); $('#lErro').textContent = A.mensagem(e); } else { mostrar('login'); $('#lErro').textContent = A.mensagem(e); } }
+}
+async function esperarSessaoRecuperacao() { for (let i = 0; i < 20; i++) { if (await A.sessao()) return; await new Promise((r) => setTimeout(r, 150)); } }
+function mostrar(o) {
+  $('#inicio').hidden = true; $('#login').hidden = o === 'app'; $('#app').hidden = o !== 'app';
+  $('#fLogin').hidden = o !== 'login'; $('#fNova').hidden = o !== 'nova';
+  if (o === 'app') { $('#faixaDemo').hidden = !A.modoDemo; irPara(hashAtual() || 'inicio', true); assinar(); }
+}
+$('#fLogin').onsubmit = async (ev) => {
+  ev.preventDefault(); const b = $('#lBtn'); $('#lErro').textContent = ''; b.disabled = true;
+  try {
+    if (modoRecuperar) { await A.recuperar($('#lEmail').value.trim()); $('#lErro').style.color = 'var(--ok)'; $('#lErro').textContent = 'Se o e-mail for da equipe, chegou um link para criar a senha.'; return; }
+    await A.entrar($('#lEmail').value.trim(), $('#lSenha').value); await carregarTudo(); mostrar('app');
+  } catch (e) { $('#lErro').style.color = ''; $('#lErro').textContent = A.mensagem(e); } finally { b.disabled = false; }
+};
+$('#lEsqueci').onclick = () => { modoRecuperar = !modoRecuperar; $('#blSenha').hidden = modoRecuperar; $('#lSenha').required = !modoRecuperar; $('#lBtn').textContent = modoRecuperar ? 'Enviar link' : 'Entrar'; $('#lEsqueci').textContent = modoRecuperar ? 'Voltar para entrar' : 'Esqueci a senha'; $('#lErro').textContent = ''; };
+$('#fNova').onsubmit = async (ev) => { ev.preventDefault(); try { await A.novaSenha($('#nSenha').value); trocarEndereco(location.pathname); await carregarTudo(); mostrar('app'); toast('Senha salva.'); } catch (e) { $('#nErro').textContent = A.mensagem(e); } };
+$('#bSair').onclick = async () => { await A.sair(); location.hash = ''; location.reload(); };
+$('#bResetDemo').onclick = () => { A.resetarDemo(); location.reload(); };
+
+// ---------- dados ----------
+async function carregarTudo() { const d = await A.carregar(); Object.assign(S, d); montarUnidades(); contadores(); $('#euBox').innerHTML = `${avatar(S.eu, 28)}<div><b>${esc(pessoa(S.eu)?.nome || S.eu)}</b><div class="muted peq">${A.modoDemo ? 'prévia' : 'conectado'}</div></div>`; }
+let recarregando = null;
+function recarregar() { clearTimeout(recarregando); recarregando = setTimeout(async () => { try { await carregarTudo(); render(); } catch (e) { falha(e); } }, 400); }
+let assinado = false;
+async function assinar() {
+  if (assinado) return; assinado = true;
+  try {
+    await A.assinar((tabela, tipo, row) => {
+      if (tipo === 'INSERT' && tabela === 'contatos' && row.origem === 'formulario') toast('Novo lead pelo formulário: ' + (row.nome || ''), '', { rot: 'Abrir', fn: () => abrirContato(row.id) });
+      else if (tipo === 'INSERT' && tabela === 'emails' && row.direcao === 'recebido') toast('E-mail novo: ' + (row.assunto || ''));
+      else if (tipo === 'INSERT' && tabela === 'tarefas' && row.criado_por !== S.eu && (row.responsavel === S.eu || row.responsavel === 'ambos')) toast('Nova tarefa para você: ' + (row.titulo || ''));
+      else if (tipo === 'UPDATE' && tabela === 'tarefas' && row.responsavel === S.eu && (S.tarefas.find((t) => t.id === row.id) || {}).responsavel !== S.eu) toast('Passaram uma tarefa para você: ' + (row.titulo || ''));
+      recarregar();
+    });
+  } catch (e) { console.warn('tempo real indisponível', e); }
+}
+function montarUnidades() {
+  const sel = $('#selUnidade'); sel.innerHTML = `<option value="todas">Todas as unidades</option>` + S.unidades.filter((u) => u.ativo !== false).map((u) => `<option value="${esc(u.id)}">${esc(u.nome)}</option>`).join('') + '<option value="__nova__">+ Nova unidade…</option>';
+  if (![...sel.options].some((o) => o.value === S.unidade)) S.unidade = 'todas'; sel.value = S.unidade;
+}
+$('#selUnidade').onchange = (e) => { if (e.target.value === '__nova__') return; S.unidade = e.target.value; A.local.set('crm-unidade', S.unidade); render(); };
+function contadores() {
+  const novos = S.contatos.filter((c) => c.etapa === 'novo' && !c.arquivado).length;
+  const minhas = S.tarefas.filter((t) => t.status !== 'feita' && (t.responsavel === S.eu || t.responsavel === 'ambos')).length;
+  const nl = S.emails.filter((e) => !e.lido && e.direcao === 'recebido').length;
+  [['#cLeads', novos], ['#cTarefas', minhas], ['#cEmails', nl], ['#cPastas', (S.arquivos || []).filter((a) => a.status === 'duvida').length], ['#cLemb', (S.lembretes || []).filter((l) => !l.feito && new Date(l.quando) < new Date() && (l.para === S.eu || l.para === 'ambos')).length]].forEach(([s, n]) => { $(s).hidden = !n; $(s).textContent = n; });
+}
+async function salvar(tabela, row, msg) {
+  try { const r = await A.salvar(tabela, row); const lista = S[tabela]; const i = lista.findIndex((x) => x.id === r.id); if (i >= 0) lista[i] = r; else lista.unshift(r); contadores(); if (msg) toast(msg); return r; }
+  catch (e) { falha(e); throw e; }
+}
+
+// ---------- navegação ----------
+const TITULOS = { inicio: 'Início', leads: 'Leads e clientes', tarefas: 'Tarefas', trabalhos: 'Trabalhos', projetos: 'Projetos', emails: 'E-mails', pastas: 'Pastas', lembretes: 'Lembretes', formularios: 'Formulários', conectar: 'Conectar projetos', objetivos: 'Meus objetivos' };
+function irPara(v, inicial) { if (!TITULOS[v]) v = 'inicio'; S.view = v; if (!inicial || hashAtual() !== v) trocarEndereco('#' + v); $$('.nav').forEach((n) => n.classList.toggle('ativo', n.dataset.v === v)); $('#titulo').textContent = TITULOS[v]; $('#lado').classList.remove('aberto'); render(); }
+$$('.nav').forEach((n) => (n.onclick = () => irPara(n.dataset.v)));
+$('#bMenu').onclick = () => $('#lado').classList.toggle('aberto');
+window.addEventListener('hashchange', () => { const v = hashAtual(); if (v && v !== S.view && !$('#app').hidden) irPara(v); });
+function render() { const f = { inicio: vInicio, leads: vLeads, tarefas: vTarefas, trabalhos: vTrabalhos, projetos: vProjetos, emails: vEmails, pastas: vPastas, lembretes: vLembretes, formularios: vFormularios, conectar: vConectar, objetivos: vObjetivos }[S.view]; $('#conteudo').innerHTML = ''; f($('#conteudo')); }
+$('#bNovo').onclick = () => { if (S.view === 'objetivos') return editarObjetivo({}); if (S.view === 'tarefas') editarTarefa({}); else if (S.view === 'trabalhos') editarProjeto({}); else if (S.view === 'projetos') editarPlano({}); else if (S.view === 'lembretes') editarLembrete({}); else if (S.view === 'formularios') editarPlanilha({}); else if (S.view === 'pastas') editarPasta(S.pastaAtual ? { pai_id: S.pastaAtual, unidade: S.pastas.find((x) => x.id === S.pastaAtual)?.unidade } : {}); else novoContato(); };
+
+// ---------- meus objetivos ----------
+const MESES_C = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+function prazoObjetivo(o) {
+  if (!o.prazo) return '<span class="chip">Sem data</span>';
+  const d = new Date(o.prazo.slice(0, 10) + 'T12:00'), h = new Date(hoje() + 'T12:00'), dias = Math.round((d - h) / 864e5);
+  const dt = `${d.getDate()} de ${MESES_C[d.getMonth()]}${d.getFullYear() !== h.getFullYear() ? ' de ' + d.getFullYear() : ''}`;
+  if (o.feito) return `<span class="chip">📅 ${dt}</span>`;
+  const resto = dias > 1 ? `faltam ${dias} dias` : dias === 1 ? 'falta 1 dia' : dias === 0 ? 'é hoje' : `passou ${-dias} dia${dias === -1 ? '' : 's'}`;
+  return `<span class="chip ${dias < 0 ? 'alerta' : ''}">📅 ${dt} · ${resto}</span>`;
+}
+function vObjetivos(el) {
+  const f = S.filtros; f.obj = f.obj || 'andamento';
+  const todos = (S.objetivos || []).slice();
+  const lista = todos.filter((o) => f.obj === 'todos' || (f.obj === 'feitos' ? o.feito : !o.feito))
+    .sort((a, b) => (a.feito - b.feito) || (a.feito ? (b.feito_em || '').localeCompare(a.feito_em || '') : (a.prazo || '9999').localeCompare(b.prazo || '9999')));
+  const nA = todos.filter((o) => !o.feito).length, nF = todos.filter((o) => o.feito).length;
+  el.innerHTML = `<div class="filtros"><div class="seg">${[['andamento', `Em andamento (${nA})`], ['feitos', `Concluídos (${nF})`], ['todos', 'Todos']].map(([k, n]) => `<button data-o="${k}" class="${f.obj === k ? 'ativo' : ''}">${n}</button>`).join('')}</div>
+    <span class="aviso-priv">🔒 Seus objetivos pessoais e da empresa, com a data que você quer chegar lá.</span><button class="btn pri peq" id="bNovoObj" style="margin-left:auto">+ Objetivo</button></div>
+    <div class="obj-grade" id="og">${lista.map((o) => {
+      let barra = '';
+      if (!o.feito && o.prazo) { const ini = new Date(o.criado_em || Date.now()), fim = new Date(o.prazo.slice(0, 10) + 'T12:00'), pc = Math.max(3, Math.min(100, Math.round((Date.now() - ini) / Math.max(1, fim - ini) * 100))); barra = `<div class="barra" title="Tempo já passado até a data"><i style="width:${pc}%"></i></div>`; }
+      const venc = !o.feito && o.prazo && o.prazo.slice(0, 10) < hoje();
+      return `<article class="obj ${o.feito ? 'feito' : ''} ${venc ? 'vencido' : ''}" data-id="${o.id}"><h3>${esc(o.titulo)}</h3>${o.descricao ? `<p>${esc(o.descricao)}</p>` : ''}${barra}
+        <div class="pe">${prazoObjetivo(o)}${o.feito ? `<span class="chip verde">✓ Concluído</span><button class="btn peq fant" data-acao="reabrir">Reabrir</button>` : '<button class="btn pri peq" data-acao="concluir">✓ Concluir</button>'}</div></article>`; }).join('') || `<div class="vazio" style="grid-column:1/-1">${f.obj === 'feitos' ? 'Nenhum objetivo concluído ainda.' : 'Nenhum objetivo aqui. Toque em “+ Objetivo” e coloque a data que você quer conquistar.'}</div>`}</div>`;
+  $$('.seg button', el).forEach((b) => (b.onclick = () => { f.obj = b.dataset.o; render(); }));
+  $('#bNovoObj').onclick = () => editarObjetivo({});
+  $$('.obj', el).forEach((c) => c.addEventListener('click', async (e) => {
+    const o = S.objetivos.find((x) => x.id === c.dataset.id); if (!o) return;
+    const a = e.target.closest('[data-acao]')?.dataset.acao;
+    if (!a) return editarObjetivo(o);
+    try {
+      if (a === 'concluir') { await salvar('objetivos', { id: o.id, feito: true, feito_em: new Date().toISOString() }); toast('Objetivo concluído! 🎉', '', { rot: 'Desfazer', fn: async () => { await salvar('objetivos', { id: o.id, feito: false, feito_em: null }); render(); } }); }
+      if (a === 'reabrir') await salvar('objetivos', { id: o.id, feito: false, feito_em: null }, 'Objetivo reaberto');
+    } catch {}
+    render();
+  }));
+}
+function editarObjetivo(o0) {
+  const o = { ...o0 }, novo = !o.id;
+  const { v, fechar } = abrirVeu(`<div class="modal"><header><h3>${novo ? 'Novo objetivo' : 'Objetivo'}</h3><button class="x" aria-label="Fechar">×</button></header>
+    <form class="miolo" id="fOb"><div><label class="rot">Objetivo *</label><input class="campo" name="titulo" required maxlength="120" value="${esc(o.titulo || '')}" placeholder="Ex.: MacBook, morar sozinho, 10 clientes"></div>
+    <div><label class="rot">Por quê</label><textarea class="campo" name="descricao" rows="3" maxlength="600" placeholder="O que muda quando você chegar lá">${esc(o.descricao || '')}</textarea></div>
+    <div><label class="rot">Até quando</label><input class="campo" name="prazo" type="date" value="${esc((o.prazo || '').slice(0, 10))}"></div>
+    <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">${novo ? '<span></span>' : '<button type="button" class="btn fant" id="obDel" style="color:var(--alerta)">Apagar</button>'}<button class="btn pri">Salvar</button></div></form></div>`);
+  $('#fOb', v).onsubmit = async (e) => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); d.titulo = d.titulo.trim(); d.descricao = d.descricao.trim() || null; d.prazo = d.prazo || null; if (!novo) d.id = o.id; else d.feito = false;
+    try { await salvar('objetivos', d, novo ? 'Objetivo criado' : 'Objetivo salvo'); fechar(); render(); } catch {} };
+  const del = $('#obDel', v); if (del) { let armado = false; del.onclick = async () => { if (!armado) { armado = true; del.textContent = 'Toque de novo para apagar'; return; } try { await A.apagar('objetivos', o.id); S.objetivos = S.objetivos.filter((x) => x.id !== o.id); toast('Objetivo apagado'); fechar(); render(); } catch (er) { toast(A.mensagem(er), 'erro'); } }; }
+}
+
+// ---------- início ----------
+function vInicio(el) {
+  const h = hoje(), c = S.contatos.filter((x) => doFiltroUnidade(x) && !x.arquivado), t = S.tarefas.filter((x) => S.unidade === 'todas' || !x.unidade || x.unidade === S.unidade);
+  const semana = Date.now() - 7 * 864e5, mes = h.slice(0, 7);
+  const minhas = t.filter((x) => x.status !== 'feita' && (x.responsavel === S.eu || x.responsavel === 'ambos'));
+  const atrasadas = t.filter((x) => x.status !== 'feita' && x.prazo && x.prazo < h);
+  const fechadosMes = c.filter((x) => x.etapa === 'fechado' && (x.atualizado_em || '').slice(0, 7) === mes);
+  const somaMes = {}; fechadosMes.forEach((x) => { if (x.valor) somaMes[x.moeda || 'BRL'] = (somaMes[x.moeda || 'BRL'] || 0) + Number(x.valor); });
+  const nl = S.emails.filter((e) => !e.lido && e.direcao === 'recebido' && doFiltroUnidade(e));
+  const retornar = c.filter((x) => x.proximo_contato && x.proximo_contato <= h && !['fechado', 'perdido'].includes(x.etapa));
+  const nome = pessoa(S.eu)?.nome || '';
+  const hora = new Date().getHours();
+  el.innerHTML = `
+    <p class="muted" style="margin:0 0 14px">${hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite'}, <b style="color:var(--txt)">${esc(nome)}</b>. ${minhas.length ? `Você tem ${minhas.length} tarefa${minhas.length > 1 ? 's' : ''} aberta${minhas.length > 1 ? 's' : ''}.` : 'Nenhuma tarefa aberta para você.'}</p>
+    <div class="kpis">
+      <div class="cartao kpi" data-ir="leads"><small>Leads nos últimos 7 dias</small><b>${c.filter((x) => new Date(x.criado_em) > semana).length}</b></div>
+      <div class="cartao kpi ${c.filter((x) => x.etapa === 'novo').length ? 'alerta' : ''}" data-ir="leads"><small>Novos sem contato</small><b>${c.filter((x) => x.etapa === 'novo').length}</b></div>
+      <div class="cartao kpi" data-ir="tarefas"><small>Suas tarefas abertas</small><b>${minhas.length}</b></div>
+      <div class="cartao kpi ${atrasadas.length ? 'alerta' : ''}" data-ir="tarefas"><small>Tarefas atrasadas</small><b>${atrasadas.length}</b></div>
+      <div class="cartao kpi" data-ir="emails"><small>E-mails não lidos</small><b>${nl.length}</b></div>
+      <div class="cartao kpi" data-ir="leads"><small>Fechados no mês</small><b>${fechadosMes.length}</b>${Object.keys(somaMes).length ? `<small>${Object.entries(somaMes).map(([m, v]) => moeda(v, m)).join(' + ')}</small>` : ''}</div>
+    </div>
+    <div class="dash">
+      <div class="cartao"><div class="cab"><h3>Suas tarefas</h3><button class="btn peq" data-ir="tarefas">Ver todas</button></div><div class="lista-itens" id="dTar"></div></div>
+      <div class="cartao"><div class="cab"><h3>Leads recentes</h3><button class="btn peq" data-ir="leads">Abrir quadro</button></div><div class="lista-itens" id="dLeads"></div></div>
+      <div class="cartao"><div class="cab"><h3>Retornar hoje</h3><span class="chip">${retornar.length}</span></div><div class="lista-itens" id="dRet"></div></div>
+      <div class="cartao"><div class="cab"><h3>E-mails não lidos</h3><button class="btn peq" data-ir="emails">Caixa</button></div><div class="lista-itens" id="dEm"></div></div>
+      <div class="cartao"><div class="cab"><h3>Próximos lembretes</h3><button class="btn peq" data-ir="lembretes">Ver</button></div><div class="lista-itens" id="dLemb"></div></div>
+      <div class="cartao"><div class="cab"><h3>Pastas com pendências</h3><button class="btn peq" data-ir="pastas">Abrir</button></div><div class="lista-itens" id="dPastas"></div></div>
+      <div class="cartao"><div class="cab"><h3>Funil</h3></div><div style="padding:12px 14px" id="dFunil"></div></div>
+    </div>`;
+  $$('[data-ir]', el).forEach((b) => { b.style.cursor = 'pointer'; b.onclick = () => irPara(b.dataset.ir); });
+  const ord = minhas.slice().sort((a, b) => (a.prazo || '9999') < (b.prazo || '9999') ? -1 : 1).slice(0, 7);
+  $('#dTar').innerHTML = ord.map((x) => `<div data-t="${x.id}">${avatar(x.responsavel)}<span style="flex:1;min-width:0">${esc(x.titulo)}</span>${prazoChip(x.prazo)}</div>`).join('') || '<p class="vazio">Tudo em dia 🎉</p>';
+  $$('#dTar [data-t]').forEach((d) => (d.onclick = () => editarTarefa(S.tarefas.find((x) => x.id === d.dataset.t))));
+  const linhaContato = (x, extra) => `<div data-c="${x.id}"><span class="ponto" style="background:${ETAPA[x.etapa]?.c}"></span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b>${esc(x.nome)}</b> <span class="muted">${esc(x.empresa || '')}</span></span>${extra || ''}</div>`;
+  $('#dLeads').innerHTML = c.slice().sort((a, b) => (a.criado_em < b.criado_em ? 1 : -1)).slice(0, 7).map((x) => linhaContato(x, `<span class="muted peq">${relativo(x.criado_em)}</span>`)).join('') || '<p class="vazio">Nenhum lead ainda. Copie o link do formulário e coloque na bio.</p>';
+  $('#dRet').innerHTML = retornar.slice(0, 7).map((x) => linhaContato(x, prazoChip(x.proximo_contato))).join('') || '<p class="vazio">Ninguém para retornar hoje.</p>';
+  $$('#dLeads [data-c], #dRet [data-c]').forEach((d) => (d.onclick = () => abrirContato(d.dataset.c)));
+  $('#dEm').innerHTML = nl.slice(0, 6).map((e) => `<div data-e="${e.id}"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b>${esc(e.de_nome || e.de)}</b> · ${esc(e.assunto || '(sem assunto)')}</span><span class="muted peq">${relativo(e.data)}</span></div>`).join('') || '<p class="vazio">Caixa em dia.</p>';
+  $$('#dEm [data-e]').forEach((d) => (d.onclick = () => abrirEmail(d.dataset.e)));
+  const lbs = S.lembretes.filter((l) => !l.feito && (l.para === S.eu || l.para === 'ambos')).sort((a, b) => a.quando.localeCompare(b.quando)).slice(0, 6);
+  $('#dLemb').innerHTML = lbs.map((l) => `<div data-lbi="${l.id}"><span>⏰</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.titulo)}</span><span class="chip ${new Date(l.quando) < new Date() ? 'alerta' : ''}">${quandoTexto(l.quando)}</span></div>`).join('') || '<p class="vazio">Nenhum lembrete.</p>';
+  $$('#dLemb [data-lbi]').forEach((x) => (x.onclick = () => editarLembrete(S.lembretes.find((l) => l.id === x.dataset.lbi))));
+  const comPend = S.pastas.filter((p) => S.unidade === 'todas' || !p.unidade || p.unidade === S.unidade).map((p) => ({ p, n: S.arquivos.filter((a) => a.pasta_id === p.id && a.status !== 'feito').length, d: S.arquivos.filter((a) => a.pasta_id === p.id && a.status === 'duvida').length })).filter((x) => x.n).sort((a, b) => b.d - a.d || b.n - a.n).slice(0, 6);
+  $('#dPastas').innerHTML = comPend.map(({ p, n, d }) => `<div data-pa="${p.id}">📁<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.nome)}</span>${d ? `<span class="chip alerta">${d} dúvida</span>` : ''}<span class="chip">${n} pendente${n > 1 ? 's' : ''}</span></div>`).join('') || '<p class="vazio">Tudo marcado ✔</p>';
+  $$('#dPastas [data-pa]').forEach((x) => (x.onclick = () => { S.pastaAtual = x.dataset.pa; irPara('pastas'); }));
+  const ativos = c.filter((x) => x.etapa !== 'perdido'), max = Math.max(1, ...ETAPAS.map(([k]) => c.filter((x) => x.etapa === k).length));
+  $('#dFunil').innerHTML = ETAPAS.map(([k, n, cor]) => { const q = c.filter((x) => x.etapa === k).length; return `<div style="display:flex;align-items:center;gap:8px;margin:5px 0"><span style="width:118px" class="peq">${n}</span><div style="flex:1;background:var(--card-2);border-radius:6px;height:16px;overflow:hidden"><div style="width:${(q / max) * 100}%;background:${cor};height:100%"></div></div><b style="width:26px;text-align:right">${q}</b></div>`; }).join('') + `<p class="muted peq" style="margin:8px 0 0">${ativos.length} contatos ativos</p>`;
+}
+
+// ---------- leads ----------
+function contatosFiltrados() {
+  const f = S.filtros, q = (f.q || '').toLowerCase().trim();
+  return S.contatos.filter((c) => doFiltroUnidade(c) && (f.arquivados ? c.arquivado : !c.arquivado) && (!f.resp || (f.resp === 'sem' ? !c.responsavel : c.responsavel === f.resp)) && (!f.origem || c.origem === f.origem) && (!f.tipo || c.tipo === f.tipo) && (!f.interesse || (c.interesses || []).includes(f.interesse)) &&
+    (!q || [c.nome, c.empresa, c.nicho, c.cidade, c.pais, c.email, c.telefone, c.instagram, ...(c.tags || [])].some((v) => String(v || '').toLowerCase().includes(q))));
+}
+function cartaoLead(c) {
+  const ints = (c.interesses || []).slice(0, 3).map((i) => `<span class="chip">${esc(INTERESSES[i] || i)}</span>`).join('');
+  return `<div class="lead" draggable="true" data-id="${c.id}">
+    <div class="nome">${avatar(c.responsavel, 20)}<span>${esc(c.nome)}</span></div>
+    <div class="sub">${esc([c.empresa, c.nicho, c.cidade].filter(Boolean).join(' · ') || '—')}</div>
+    <div class="pe">${ints}${c.valor ? `<span class="chip verde">${moeda(c.valor, c.moeda)}</span>` : ''}${c.proximo_contato ? prazoChip(c.proximo_contato) : ''}${S.unidade === 'todas' ? `<span class="ponto" title="${esc(unidade(c.unidade).nome)}" style="background:${esc(unidade(c.unidade).cor)}"></span>` : ''}
+    <select class="campo mover" style="width:auto;padding:2px 4px;font-size:12px" aria-label="Mover etapa">${ETAPAS.map(([k, n]) => `<option value="${k}" ${k === c.etapa ? 'selected' : ''}>${n}</option>`).join('')}</select></div></div>`;
+}
+function vLeads(el) {
+  const f = S.filtros; f.modo = f.modo || A.local.get('crm-leads-modo') || 'quadro';
+  el.innerHTML = `<div class="filtros">
+    <div class="seg"><button data-m="quadro" class="${f.modo === 'quadro' ? 'ativo' : ''}">Quadro</button><button data-m="lista" class="${f.modo === 'lista' ? 'ativo' : ''}">Lista</button></div>
+    <input class="campo" id="fq" placeholder="Filtrar por nome, nicho, cidade…" value="${esc(f.q || '')}" style="min-width:200px">
+    <select class="campo" id="fresp"><option value="">Qualquer responsável</option>${S.equipe.map((e) => `<option value="${e.apelido}" ${f.resp === e.apelido ? 'selected' : ''}>${esc(e.nome)}</option>`).join('')}<option value="ambos" ${f.resp === 'ambos' ? 'selected' : ''}>Os dois</option><option value="sem" ${f.resp === 'sem' ? 'selected' : ''}>Sem responsável</option></select>
+    <select class="campo" id="forigem"><option value="">Qualquer origem</option>${Object.entries(ORIGENS).map(([k, n]) => `<option value="${k}" ${f.origem === k ? 'selected' : ''}>${n}</option>`).join('')}</select>
+    <select class="campo" id="fint"><option value="">Qualquer interesse</option>${Object.entries(INTERESSES).map(([k, n]) => `<option value="${k}" ${f.interesse === k ? 'selected' : ''}>${n}</option>`).join('')}</select>
+    <select class="campo" id="ftipo"><option value="">Todos os tipos</option>${Object.entries(TIPOS).map(([k, n]) => `<option value="${k}" ${f.tipo === k ? 'selected' : ''}>${n}</option>`).join('')}</select>
+    <label class="peq muted" style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="farq" ${f.arquivados ? 'checked' : ''}> Arquivados</label>
+    <button class="btn peq" id="bCsv" style="margin-left:auto">Exportar CSV</button></div><div id="lAlvo"></div>`;
+  $$('.seg button', el).forEach((b) => (b.onclick = () => { f.modo = b.dataset.m; A.local.set('crm-leads-modo', f.modo); render(); }));
+  const on = (id, k, ev = 'change') => ($('#' + id).addEventListener(ev, (e) => { f[k] = e.target.type === 'checkbox' ? e.target.checked : e.target.value; desenhar(); }));
+  on('fq', 'q', 'input'); on('fresp', 'resp'); on('forigem', 'origem'); on('fint', 'interesse'); on('ftipo', 'tipo'); on('farq', 'arquivados');
+  $('#bCsv').onclick = () => exportarCsv(contatosFiltrados());
+  function desenhar() {
+    const lista = contatosFiltrados(), alvo = $('#lAlvo');
+    if (f.modo === 'lista') {
+      alvo.innerHTML = `<div class="cartao rolagem"><table class="tab"><thead><tr><th>Nome</th><th>Empresa</th><th>Etapa</th><th>Interesse</th><th>Cidade</th><th>Origem</th><th>Resp.</th><th>Entrou</th></tr></thead><tbody>${lista.sort((a, b) => (a.criado_em < b.criado_em ? 1 : -1)).map((c) => `<tr data-id="${c.id}"><td><b>${esc(c.nome)}</b></td><td>${esc(c.empresa || '')}</td><td><span class="chip"><span class="ponto" style="background:${ETAPA[c.etapa]?.c}"></span>${ETAPA[c.etapa]?.n}</span></td><td>${(c.interesses || []).map((i) => esc(INTERESSES[i] || i)).join(', ')}</td><td>${esc([c.cidade, c.pais].filter(Boolean).join(', '))}</td><td>${esc(ORIGENS[c.origem] || '')}</td><td>${avatar(c.responsavel)}</td><td class="muted">${data(c.criado_em)}</td></tr>`).join('')}</tbody></table>${lista.length ? '' : '<p class="vazio">Nenhum contato com esses filtros.</p>'}</div>`;
+      $$('tr[data-id]', alvo).forEach((tr) => (tr.onclick = () => abrirContato(tr.dataset.id)));
+      return;
+    }
+    alvo.innerHTML = `<div class="quadro">${ETAPAS.map(([k, n, cor]) => { const it = lista.filter((c) => c.etapa === k).sort((a, b) => (a.atualizado_em < b.atualizado_em ? 1 : -1)); const soma = {}; it.forEach((c) => c.valor && (soma[c.moeda || 'BRL'] = (soma[c.moeda || 'BRL'] || 0) + Number(c.valor)));
+      return `<section class="coluna" data-etapa="${k}"><header><span class="ponto" style="background:${cor}"></span>${n}<small>${it.length}${Object.keys(soma).length ? ' · ' + Object.entries(soma).map(([m, v]) => moeda(v, m)).join(' + ') : ''}</small></header><div class="itens">${it.map(cartaoLead).join('') || '<p class="vazio" style="padding:10px">—</p>'}</div></section>`; }).join('')}</div>`;
+    $$('.lead', alvo).forEach((d) => {
+      d.onclick = (e) => { if (e.target.closest('select')) return; abrirContato(d.dataset.id); };
+      d.ondragstart = (e) => { e.dataTransfer.setData('text/plain', d.dataset.id); d.classList.add('arrastando'); };
+      d.ondragend = () => d.classList.remove('arrastando');
+      $('select', d).onchange = (e) => moverEtapa(d.dataset.id, e.target.value);
+    });
+    $$('.coluna', alvo).forEach((col) => {
+      col.ondragover = (e) => { e.preventDefault(); col.classList.add('sobre'); };
+      col.ondragleave = () => col.classList.remove('sobre');
+      col.ondrop = (e) => { e.preventDefault(); col.classList.remove('sobre'); moverEtapa(e.dataTransfer.getData('text/plain'), col.dataset.etapa); };
+    });
+  }
+  desenhar();
+}
+async function moverEtapa(id, etapa) {
+  const c = S.contatos.find((x) => x.id === id); if (!c || c.etapa === etapa) return;
+  let extra = {};
+  if (etapa === 'perdido') { const m = prompt('Por que perdemos este lead? (opcional)', c.motivo_perda || ''); if (m === null) return render(); extra.motivo_perda = m.trim() || null; }
+  if (etapa === 'fechado' && !c.responsavel) extra.responsavel = S.eu;
+  const antes = c.etapa;
+  try { await salvar('contatos', { id, etapa, ...extra }); toast(`${c.nome} → ${ETAPA[etapa].n}`, '', { rot: 'Desfazer', fn: async () => { await salvar('contatos', { id, etapa: antes }); render(); } }); if (etapa === 'fechado') toast('Fechou! 🎉 Crie o trabalho na ficha do cliente.'); } catch {}
+  render();
+}
+function exportarCsv(lista) {
+  const cols = [['nome', 'Nome'], ['empresa', 'Empresa'], ['nicho', 'Nicho'], ['cidade', 'Cidade'], ['pais', 'País'], ['telefone', 'WhatsApp'], ['email', 'E-mail'], ['instagram', 'Instagram'], ['etapa', 'Etapa'], ['interesses', 'Interesses'], ['origem', 'Origem'], ['responsavel', 'Responsável'], ['valor', 'Valor'], ['moeda', 'Moeda'], ['unidade', 'Unidade'], ['criado_em', 'Entrou em']];
+  const cel = (v) => { let s = Array.isArray(v) ? v.join(', ') : String(v ?? ''); if (/^[=+\-@]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
+  const csv = '﻿' + cols.map((c) => cel(c[1])).join(';') + '\n' + lista.map((c) => cols.map(([k]) => cel(k === 'etapa' ? ETAPA[c.etapa]?.n : c[k])).join(';')).join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = `contatos-${hoje()}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+// ---------- ficha do contato ----------
+function abrirVeu(html, centro) {
+  const v = document.createElement('div'); v.className = 'veu' + (centro ? ' centro' : ''); v.innerHTML = html; document.body.appendChild(v);
+  if (SOLO()) $$('select[name="responsavel"],select[name="para"]', v).forEach((sel) => { const box = sel.closest('div'); if (box && !box.classList.contains('grade') && !box.classList.contains('veu')) box.hidden = true; });
+  const fechar = () => { v.remove(); document.removeEventListener('keydown', esc_); };
+  const esc_ = (e) => { if (e.key !== 'Escape') return; const todos = $$('.veu'); if (todos[todos.length - 1] === v) { e.stopImmediatePropagation(); fechar(); } };
+  v.addEventListener('mousedown', (e) => { if (e.target === v) fechar(); }); document.addEventListener('keydown', esc_);
+  $$('.x,[data-fechar]', v).forEach((b) => (b.onclick = fechar));
+  return { v, fechar };
+}
+const opcoes = (obj, atual, vazio) => (vazio != null ? `<option value="">${vazio}</option>` : '') + Object.entries(obj).map(([k, n]) => `<option value="${esc(k)}" ${k === (atual ?? '') ? 'selected' : ''}>${esc(n)}</option>`).join('');
+const opResp = (atual, comAmbos = true, vazio = 'Ninguém') => SOLO() ? `<option value="${esc(S.eu)}" selected>${esc(pessoa(S.eu)?.nome || 'Eu')}</option>` : (vazio ? `<option value="">${vazio}</option>` : '') + S.equipe.map((e) => `<option value="${e.apelido}" ${atual === e.apelido ? 'selected' : ''}>${esc(e.nome)}</option>`).join('') + (comAmbos ? `<option value="ambos" ${atual === 'ambos' ? 'selected' : ''}>Os dois</option>` : '');
+const opUnid = (atual) => S.unidades.filter((u) => u.ativo !== false || u.id === atual).map((u) => `<option value="${esc(u.id)}" ${u.id === atual ? 'selected' : ''}>${esc(u.nome)}</option>`).join('') + '<option value="__nova__">+ Nova unidade…</option>';
+// "+ Nova unidade…" em qualquer seletor de unidade: cria na hora e já seleciona
+document.addEventListener('focusin', (e) => { if (e.target instanceof HTMLSelectElement && e.target.value !== '__nova__') e.target.dataset.ant = e.target.value; });
+document.addEventListener('change', (e) => {
+  const sel = e.target; if (!(sel instanceof HTMLSelectElement) || sel.value !== '__nova__') return;
+  const antes = sel.dataset.ant ?? [...sel.options].find((o) => o.defaultSelected)?.value ?? '';
+  sel.value = antes;
+  editarUnidade({}, (u) => { const o = document.createElement('option'); o.value = u.id; o.textContent = u.nome; sel.insertBefore(o, sel.querySelector('option[value="__nova__"]')); sel.value = u.id; sel.dispatchEvent(new Event('change', { bubbles: true })); });
+});
+function editarUnidade(u0, depois) {
+  const u = { cor: '#1f7a4d', ativo: true, ...u0 }, novo = !u.id;
+  const { v, fechar } = abrirVeu(`<div class="modal" style="width:min(440px,100%)"><header><h3>${novo ? 'Nova unidade' : 'Unidade'}</h3><button class="x" aria-label="Fechar">×</button></header>
+    <form class="miolo" id="fUn"><div><label class="rot">Nome *</label><input class="campo" name="nome" required maxlength="60" value="${esc(u.nome || '')}" placeholder="Ex.: Mantoo, NeewsTok, Relatos do Breu"></div>
+    <div class="grade g2"><div><label class="rot">Cor</label><input class="campo" type="color" name="cor" value="${esc(u.cor)}" style="height:40px;padding:4px"></div>
+    ${novo ? '' : `<div><label class="rot">Situação</label><select class="campo" name="ativo"><option value="true" ${u.ativo !== false ? 'selected' : ''}>Ativa</option><option value="false" ${u.ativo === false ? 'selected' : ''}>Arquivada (some das listas)</option></select></div>`}</div>
+    <div><label class="rot">Descrição</label><input class="campo" name="descricao" maxlength="120" value="${esc(u.descricao || '')}"></div>
+    ${novo ? '' : `<p class="muted peq" style="margin:0">Código: <code>${esc(u.id)}</code> (usado nos links e integrações; não muda)</p>`}
+    <footer style="padding:0;border:0"><button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri">Salvar</button></footer></form></div>`, true);
+  $('[name=nome]', v).focus();
+  $('#fUn', v).onsubmit = async (e) => {
+    e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); const nome = d.nome.trim();
+    const dados = { nome, cor: d.cor, descricao: d.descricao.trim() || null };
+    if (!novo) dados.ativo = d.ativo !== 'false';
+    try {
+      let r;
+      if (novo) { let base = nome.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 28) || 'unidade'; if (base.length < 2) base += '-u'; let id = base, n = 2; while (S.unidades.some((x) => x.id === id)) id = base + '-' + n++;
+        r = await A.salvarUnidade({ id, ...dados, ordem: 10 + S.unidades.length }); if (!S.unidades.some((x) => x.id === r.id)) S.unidades.push(r); }
+      else { r = await A.salvarUnidade({ id: u.id, ...dados }, true); const i = S.unidades.findIndex((x) => x.id === u.id); S.unidades[i] = r; }
+      montarUnidades(); toast(novo ? 'Unidade criada' : 'Unidade salva'); fechar(); depois ? depois(r) : render();
+    } catch (er) { falha(er); }
+  };
+}
+
+function novoContato() {
+  const { v, fechar } = abrirVeu(`<div class="modal"><header><h3>Novo contato</h3><button class="x" aria-label="Fechar">×</button></header>
+    <form class="miolo" id="fNC"><div class="grade g2"><div><label class="rot">Nome *</label><input class="campo" name="nome" required maxlength="80"></div><div><label class="rot">Empresa</label><input class="campo" name="empresa" maxlength="100"></div>
+    <div><label class="rot">WhatsApp</label><input class="campo" name="telefone" placeholder="+55 47 9…"></div><div><label class="rot">E-mail</label><input class="campo" name="email" type="email"></div>
+    <div><label class="rot">Instagram</label><input class="campo" name="instagram" placeholder="@perfil"></div><div><label class="rot">Nicho</label><input class="campo" name="nicho"></div>
+    <div><label class="rot">Origem</label><select class="campo" name="origem">${opcoes(ORIGENS, 'manual')}</select></div><div><label class="rot">Unidade</label><select class="campo" name="unidade">${opUnid(S.unidade !== 'todas' ? S.unidade : 'atlas-leads')}</select></div>
+    <div><label class="rot">Responsável</label><select class="campo" name="responsavel">${opResp(S.eu)}</select></div><div><label class="rot">Tipo</label><select class="campo" name="tipo">${opcoes(TIPOS, 'lead')}</select></div></div>
+    <footer style="padding:0;border:0;margin-top:4px"><button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri">Criar</button></footer></form></div>`, true);
+  $('[name=nome]', v).focus();
+  $('#fNC', v).onsubmit = async (e) => {
+    e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); Object.keys(d).forEach((k) => { d[k] = d[k].trim(); if (!d[k]) d[k] = null; });
+    if (d.instagram) d.instagram = d.instagram.replace(/^@|^(https?:\/\/)?(www\.)?instagram\.com\//, '').replace(/\/+$/, '').toLowerCase();
+    if (d.email) d.email = d.email.toLowerCase();
+    const dup = S.contatos.find((c) => (d.email && c.email === d.email) || (d.telefone && telLimpo(c.telefone) && telLimpo(c.telefone) === telLimpo(d.telefone)));
+    if (dup && !confirm(`Já existe "${dup.nome}" com esse contato. Criar mesmo assim?`)) { fechar(); return abrirContato(dup.id); }
+    try { const r = await salvar('contatos', d, 'Contato criado'); fechar(); render(); abrirContato(r.id); } catch {}
+  };
+}
+
+async function abrirContato(id) {
+  let c = S.contatos.find((x) => x.id === id);
+  if (!c) { await carregarTudo().catch(() => {}); c = S.contatos.find((x) => x.id === id); if (!c) return toast('Contato não encontrado', 'erro'); }
+  const tel = telLimpo(c.telefone);
+  const { v, fechar } = abrirVeu(`<div class="gaveta" role="dialog" aria-label="${esc(c.nome)}"><header><div style="flex:1;min-width:0"><h2>${esc(c.nome)}</h2><div class="muted">${esc([c.empresa, c.nicho, [c.cidade, c.pais].filter(Boolean).join(', ')].filter(Boolean).join(' · '))}</div>
+    <div class="rapidos" style="margin-top:9px">${tel ? `<a class="btn peq" target="_blank" rel="noopener" href="https://wa.me/${tel}">💬 WhatsApp</a>` : ''}${c.email ? `<button class="btn peq" id="bEmailC">✉️ E-mail</button>` : ''}${c.instagram ? `<a class="btn peq" target="_blank" rel="noopener" href="https://instagram.com/${encodeURIComponent(c.instagram)}">📷 @${esc(c.instagram)}</a>` : ''}${c.site_atual ? `<a class="btn peq" target="_blank" rel="noopener" href="${/^https?:/i.test(c.site_atual) ? esc(c.site_atual) : 'https://' + esc(c.site_atual)}">🌐 Site atual</a>` : ''}${tel ? `<button class="btn peq" id="bCopTel">Copiar número</button>` : ''}<button class="btn peq" id="bLembC">⏰ Lembrete</button></div></div><button class="x" aria-label="Fechar">×</button></header>
+    <div class="miolo">
+      <div class="secao"><div class="grade g3">
+        <div><label class="rot">Etapa</label><select class="campo" id="cEtapa">${ETAPAS.map(([k, n]) => `<option value="${k}" ${k === c.etapa ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+        <div><label class="rot">Responsável</label><select class="campo" id="cResp">${opResp(c.responsavel)}</select></div>
+        <div><label class="rot">Próximo contato</label><input class="campo" type="date" id="cProx" value="${esc(c.proximo_contato || '')}"></div>
+      </div>${c.etapa === 'perdido' && c.motivo_perda ? `<p class="muted peq" style="margin:8px 0 0">Motivo da perda: ${esc(c.motivo_perda)}</p>` : ''}
+      ${c.mensagem ? `<div style="margin-top:12px"><label class="rot">Mensagem do formulário</label><div class="email-corpo" style="max-height:none">${esc(c.mensagem)}</div></div>` : ''}
+      <div class="rapidos" style="margin-top:10px">${(c.interesses || []).map((i) => `<span class="chip verde">${esc(INTERESSES[i] || i)}</span>`).join('')}${c.tem_site === false ? '<span class="chip">Ainda não tem site</span>' : ''}${c.contato_preferido ? `<span class="chip">Prefere: ${esc(c.contato_preferido)}</span>` : ''}${c.idioma && c.idioma !== 'pt-BR' ? `<span class="chip">${esc(c.idioma)}</span>` : ''}${chipUnidade(c.unidade)}<span class="chip">${esc(ORIGENS[c.origem] || c.origem)}${c.utm?.utm_source ? ' · ' + esc(c.utm.utm_source) : ''}</span></div></div>
+
+      <div class="secao"><h3>Registrar</h3>
+        <div class="seg" id="tipoNota" style="margin-bottom:8px">${['nota', 'ligacao', 'whatsapp', 'reuniao'].map((k, i) => `<button type="button" data-t="${k}" class="${i ? '' : 'ativo'}">${ATIPOS[k][0]} ${ATIPOS[k][1]}</button>`).join('')}</div>
+        <textarea class="campo" id="txNota" placeholder="O que aconteceu? Ex.: liguei, pediu proposta até sexta."></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end"><button class="btn pri peq" id="bNota">Salvar no histórico</button></div></div>
+
+      <div class="secao"><h3>Tarefas <button class="btn peq" id="bNovaTarC">+ Tarefa</button></h3><div id="cTar"></div></div>
+      <div class="secao"><h3>Trabalhos <button class="btn peq" id="bNovoProjC">+ Trabalho</button></h3><div id="cProj"></div></div>
+      <div class="secao"><h3>Histórico</h3><div class="linha-tempo" id="cTempo"><div class="giro" style="margin:10px auto"></div></div></div>
+
+      <details class="secao"><summary style="cursor:pointer;font-weight:600">Editar dados</summary>
+        <form id="fDados" class="grade g2" style="margin-top:12px">
+          ${[['nome', 'Nome'], ['empresa', 'Empresa'], ['nicho', 'Nicho'], ['cidade', 'Cidade'], ['regiao', 'Estado / região'], ['pais', 'País'], ['telefone', 'WhatsApp'], ['email', 'E-mail'], ['instagram', 'Instagram'], ['site_atual', 'Site atual']].map(([k, n]) => `<div><label class="rot">${n}</label><input class="campo" name="${k}" value="${esc(c[k] || '')}" ${k === 'nome' ? 'required' : ''}></div>`).join('')}
+          <div><label class="rot">Tipo</label><select class="campo" name="tipo">${opcoes(TIPOS, c.tipo)}</select></div>
+          <div><label class="rot">Unidade</label><select class="campo" name="unidade">${opUnid(c.unidade)}</select></div>
+          <div><label class="rot">Valor estimado</label><input class="campo" name="valor" type="number" min="0" step="1" value="${c.valor ?? ''}"></div>
+          <div><label class="rot">Moeda</label><select class="campo" name="moeda">${opcoes({ BRL: 'R$ Real', EUR: '€ Euro', USD: 'US$ Dólar' }, c.moeda || 'BRL')}</select></div>
+          <div style="grid-column:1/-1"><label class="rot">Etiquetas (separe por vírgula)</label><input class="campo" name="tags" value="${esc((c.tags || []).join(', '))}"></div>
+          <div style="grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri">Salvar dados</button><button type="button" class="btn" id="bArq">${c.arquivado ? 'Desarquivar' : 'Arquivar'}</button><button type="button" class="btn perigo" id="bApagar" style="margin-left:auto">Apagar contato</button></div>
+        </form></details>
+      <p class="muted peq">Entrou em ${data(c.criado_em, true)} · atualizado ${relativo(c.atualizado_em)}</p>
+    </div></div>`);
+  const atualizar = async (campos, msg) => { try { c = await salvar('contatos', { id: c.id, ...campos }, msg); tempo(); if (S.view !== 'conectar') render(); } catch {} };
+  $('#cEtapa', v).onchange = async (e) => { const et = e.target.value; let extra = {}; if (et === 'perdido') { const m = prompt('Por que perdemos este lead? (opcional)', c.motivo_perda || ''); if (m === null) { e.target.value = c.etapa; return; } extra.motivo_perda = m.trim() || null; } await atualizar({ etapa: et, ...extra }, 'Etapa atualizada'); };
+  $('#cResp', v).onchange = (e) => atualizar({ responsavel: e.target.value || null }, 'Responsável atualizado');
+  $('#cProx', v).onchange = (e) => atualizar({ proximo_contato: e.target.value || null }, e.target.value ? 'Lembrete marcado' : 'Lembrete removido');
+  $('#bCopTel', v)?.addEventListener('click', () => copiar(c.telefone));
+  $('#bLembC', v)?.addEventListener('click', () => editarLembrete({ contato_id: c.id, titulo: 'Falar com ' + c.nome.replace(/^Exemplo · /, '') }));
+  $('#bEmailC', v)?.addEventListener('click', () => escreverEmail({ acao: 'enviar', contato: c, depois: () => tempo() }));
+  let tipoNota = 'nota';
+  $$('#tipoNota button', v).forEach((b) => (b.onclick = () => { tipoNota = b.dataset.t; $$('#tipoNota button', v).forEach((x) => x.classList.toggle('ativo', x === b)); }));
+  $('#bNota', v).onclick = async () => { const t = $('#txNota', v).value.trim(); if (!t) return $('#txNota', v).focus(); try { await A.nota(c.id, t, tipoNota); $('#txNota', v).value = ''; toast('Registrado'); if (c.etapa === 'novo' && tipoNota !== 'nota') await atualizar({ etapa: 'em_contato' }); else tempo(); } catch (e) { falha(e); } };
+  $('#bNovaTarC', v).onclick = () => editarTarefa({ contato_id: c.id, unidade: c.unidade, titulo: '', responsavel: c.responsavel || S.eu }, () => { tarefasC(); tempo(); });
+  $('#bNovoProjC', v).onclick = () => editarProjeto({ contato_id: c.id, unidade: c.unidade, nome: (PTIPOS[(c.interesses || [])[0]] || 'Site') + ' · ' + (c.empresa || c.nome), tipo: ['site', 'cardapio', 'sistema', 'loja', 'video', 'social', 'trafego'].includes((c.interesses || [])[0]) ? c.interesses[0] : 'site', valor: c.valor, moeda: c.moeda, responsavel: c.responsavel || S.eu }, projetosC);
+  $('#fDados', v).onsubmit = async (e) => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); Object.keys(d).forEach((k) => { d[k] = d[k].trim() || null; }); d.tags = d.tags ? d.tags.split(',').map((s) => s.trim()).filter(Boolean) : []; d.valor = d.valor == null ? null : Number(d.valor); if (d.email) d.email = d.email.toLowerCase(); if (d.instagram) d.instagram = d.instagram.replace(/^@/, '').toLowerCase(); await atualizar(d, 'Dados salvos'); fechar(); abrirContato(c.id); };
+  $('#bArq', v).onclick = async () => { await atualizar({ arquivado: !c.arquivado }, c.arquivado ? 'Desarquivado' : 'Arquivado'); fechar(); };
+  $('#bApagar', v).onclick = async () => { if (!confirm(`Apagar "${c.nome}" e todo o histórico? Isso não tem volta. (Arquivar esconde sem apagar.)`)) return; try { await A.apagar('contatos', c.id); S.contatos = S.contatos.filter((x) => x.id !== c.id); fechar(); render(); toast('Contato apagado'); } catch (e) { falha(e); } };
+  function tarefasC() {
+    const ts = S.tarefas.filter((t) => t.contato_id === c.id).sort((a, b) => (a.status === 'feita') - (b.status === 'feita'));
+    $('#cTar', v).innerHTML = ts.map((t) => linhaTarefa(t, true)).join('') || '<p class="vazio" style="padding:6px">Nenhuma tarefa.</p>'; ligarTarefas($('#cTar', v), tarefasC);
+  }
+  function projetosC() {
+    const ps = S.projetos.filter((p) => p.contato_id === c.id);
+    $('#cProj', v).innerHTML = ps.map((p) => `<div class="evento" data-p="${p.id}" style="cursor:pointer"><div class="ic">📁</div><div style="flex:1"><b>${esc(p.nome)}</b><div class="muted peq">${esc(PTIPOS[p.tipo] || '')} · ${esc((PSTATUS.find((s) => s[0] === p.status) || [])[1] || '')}${p.valor ? ' · ' + moeda(p.valor, p.moeda) : ''}</div></div>${avatar(p.responsavel)}</div>`).join('') || '<p class="vazio" style="padding:6px">Nenhum projeto.</p>';
+    $$('[data-p]', $('#cProj', v)).forEach((d) => (d.onclick = () => editarProjeto(S.projetos.find((p) => p.id === d.dataset.p), projetosC)));
+  }
+  async function tempo() {
+    try {
+      const at = await A.atividades(c.id);
+      $('#cTempo', v).innerHTML = at.map((a) => { const [ic, n] = ATIPOS[a.tipo] || ['•', a.tipo]; const em = a.tipo === 'email' && a.dados?.email_id; return `<div class="evento" ${em ? `data-em="${esc(a.dados.email_id)}" style="cursor:pointer"` : ''}><div class="ic" title="${esc(n)}">${ic}</div><div style="flex:1;min-width:0"><div class="tx">${esc(a.texto)}</div><div class="muted peq">${a.autor ? esc(pessoa(a.autor)?.nome || a.autor) + ' · ' : ''}${data(a.criado_em, true)}</div></div></div>`; }).join('') || '<p class="vazio">Sem histórico ainda.</p>';
+      $$('[data-em]', $('#cTempo', v)).forEach((d) => (d.onclick = () => abrirEmail(d.dataset.em)));
+    } catch (e) { $('#cTempo', v).innerHTML = `<p class="vazio">${esc(A.mensagem(e))}</p>`; }
+  }
+  tarefasC(); projetosC(); tempo();
+}
+async function copiar(t) { try { await navigator.clipboard.writeText(t); toast('Copiado'); } catch { prompt('Copie:', t); } }
+
+// ---------- tarefas ----------
+function linhaTarefa(t, compacta) {
+  const feita = t.status === 'feita', classe = 'cor-' + (t.responsavel === 'ambos' ? 'ambos' : t.responsavel), c = t.contato_id && S.contatos.find((x) => x.id === t.contato_id);
+  const ck = Array.isArray(t.checklist) ? t.checklist : [], ckF = ck.filter((i) => i.f).length;
+  const passar = SOLO() || t.responsavel === 'ambos' ? '' : `<button class="btn peq fant" data-acao="passar" title="Passar para ${esc(pessoa(outro(t.responsavel))?.nome || '')}">⇄ Passar para ${esc(pessoa(outro(t.responsavel))?.nome || 'o outro')}</button>`;
+  return `<div class="tarefa ${feita ? 'feita' : ''} ${classe}" data-id="${t.id}">
+    <input type="checkbox" class="marca ${t.responsavel === 'ambos' ? 'ambos' : ''}" ${feita ? 'checked' : ''} aria-label="Concluir" data-acao="feita">
+    <div class="corpo"><div class="tt" data-acao="abrir">${esc(t.titulo)}</div>
+      <div class="meta">${compacta ? avatar(t.responsavel, 20) : ''}${t.status === 'fazendo' ? '<span class="chip verde">Fazendo</span>' : ''}${t.prioridade === 'alta' ? '<span class="chip alerta">Alta</span>' : ''}${prazoChip(t.prazo, feita)}${ck.length ? `<span class="chip">☑ ${ckF}/${ck.length}</span>` : ''}${c && !compacta ? `<span class="chip" data-acao="contato" style="cursor:pointer">👤 ${esc(c.nome)}</span>` : ''}${t.unidade && S.unidade === 'todas' && !compacta ? `<span class="ponto" title="${esc(unidade(t.unidade).nome)}" style="background:${esc(unidade(t.unidade).cor)}"></span>` : ''}${feita && t.concluida_por ? `<span class="muted peq">feita por ${esc(pessoa(t.concluida_por)?.nome || t.concluida_por)}</span>` : ''}</div>
+      ${feita || compacta ? '' : `<div class="acoes">${passar}${SOLO() ? '' : `<button class="btn peq fant" data-acao="ambos">${t.responsavel === 'ambos' ? '👤 Só eu' : '👥 Os dois'}</button>`}${t.status !== 'fazendo' ? '<button class="btn peq fant" data-acao="fazendo">▶ Fazendo</button>' : ''}</div>`}
+    </div></div>`;
+}
+function ligarTarefas(raiz, depois) {
+  $$('.tarefa', raiz).forEach((el) => el.addEventListener('click', async (e) => {
+    const a = e.target.closest('[data-acao]')?.dataset.acao; if (!a) return; const t = S.tarefas.find((x) => x.id === el.dataset.id); if (!t) return;
+    const fim = () => { depois ? depois() : render(); };
+    if (a === 'abrir') return editarTarefa(t, fim);
+    if (a === 'contato') return abrirContato(t.contato_id);
+    try {
+      if (a === 'feita') { const feita = e.target.checked; await salvar('tarefas', { id: t.id, status: feita ? 'feita' : 'aberta' }); if (feita) toast('Tarefa concluída ✔', '', { rot: 'Desfazer', fn: async () => { await salvar('tarefas', { id: t.id, status: 'aberta' }); fim(); } }); }
+      if (a === 'passar') { const p = outro(t.responsavel); await salvar('tarefas', { id: t.id, responsavel: p }, 'Tarefa passada para ' + (pessoa(p)?.nome || p)); }
+      if (a === 'ambos') await salvar('tarefas', { id: t.id, responsavel: t.responsavel === 'ambos' ? S.eu : 'ambos' }, t.responsavel === 'ambos' ? 'Agora é só sua' : 'Agora qualquer um dos dois pode fazer');
+      if (a === 'fazendo') await salvar('tarefas', { id: t.id, status: 'fazendo' });
+    } catch {}
+    fim();
+  }));
+}
+function vTarefas(el) {
+  const f = S.filtros; f.tstatus = f.tstatus || 'abertas';
+  el.innerHTML = `<div class="filtros"><div class="seg">${[['abertas', 'Abertas'], ['hoje', 'Hoje e atrasadas'], ['feitas', 'Feitas'], ['todas', 'Todas']].map(([k, n]) => `<button data-s="${k}" class="${f.tstatus === k ? 'ativo' : ''}">${n}</button>`).join('')}</div><input class="campo" id="ftq" placeholder="Filtrar tarefas…" value="${esc(f.tq || '')}"></div><div class="tquadro" id="tq"></div>`;
+  $$('.seg button', el).forEach((b) => (b.onclick = () => { f.tstatus = b.dataset.s; render(); }));
+  $('#ftq').oninput = (e) => { f.tq = e.target.value; desenhar(); };
+  const colunas = SOLO()
+    ? [{ apelido: 'agora', nome: 'Hoje e atrasadas', cor: 'agora' }, { apelido: 'semana', nome: 'Próximos 7 dias', cor: 'semana' }, { apelido: 'depois', nome: 'Depois e sem prazo', cor: 'depois' }]
+    : [...S.equipe.filter((e) => e.apelido === 'enrico'), { apelido: 'ambos', nome: 'Os dois' }, ...S.equipe.filter((e) => e.apelido !== 'enrico')];
+  const em7 = () => { const x = new Date(Date.now() + 7 * 864e5); return localISO(x).slice(0, 10); };
+  const naColuna = (t, p) => { if (!SOLO()) return t.responsavel === p.apelido; const h = hoje(), pz = (t.prazo || '').slice(0, 10);
+    if (p.apelido === 'agora') return !!pz && pz <= h; if (p.apelido === 'semana') return !!pz && pz > h && pz <= em7(); return !pz || pz > em7(); };
+  const prazoPadrao = (k) => k === 'agora' ? hoje() : k === 'semana' ? localISO(new Date(Date.now() + 864e5)).slice(0, 10) : null;
+  function desenhar() {
+    const h = hoje(), q = (f.tq || '').toLowerCase();
+    const base = S.tarefas.filter((t) => (S.unidade === 'todas' || !t.unidade || t.unidade === S.unidade) && (!q || t.titulo.toLowerCase().includes(q) || (t.descricao || '').toLowerCase().includes(q)) &&
+      (f.tstatus === 'todas' || (f.tstatus === 'feitas' ? t.status === 'feita' : t.status !== 'feita' && (f.tstatus !== 'hoje' || (t.prazo && t.prazo <= h)))));
+    const ord = (a, b) => (a.status === 'feita') - (b.status === 'feita') || (f.tstatus === 'feitas' ? ((a.concluida_em || '') < (b.concluida_em || '') ? 1 : -1) : 0) || (b.prioridade === 'alta') - (a.prioridade === 'alta') || (a.prazo || '9999').localeCompare(b.prazo || '9999') || (a.ordem || 0) - (b.ordem || 0);
+    $('#tq').innerHTML = colunas.map((p) => { const it = base.filter((t) => naColuna(t, p)).sort(ord); const cl = 'cor-' + p.apelido;
+      return `<section class="tcol ${cl}" data-resp="${p.apelido}"><header>${SOLO() ? '' : avatar(p.apelido, 26)}<h3>${esc(p.nome)}${!SOLO() && p.apelido === S.eu ? ' <span class="muted peq">(você)</span>' : ''}</h3><small>${it.length}</small></header>
+      <form class="nova" data-resp="${p.apelido}"><input class="campo" placeholder="${SOLO() ? 'Nova tarefa…' : p.apelido === 'ambos' ? 'Tarefa que qualquer um pode fazer…' : 'Nova tarefa para ' + esc(p.nome) + '…'}" maxlength="200"><button class="btn peq pri">+</button></form>
+      <div>${it.map((t) => linhaTarefa(t)).join('') || '<p class="vazio">Nada aqui.</p>'}</div></section>`; }).join('');
+    $$('#tq form.nova').forEach((fm) => (fm.onsubmit = async (e) => { e.preventDefault(); const inp = $('input', fm), titulo = inp.value.trim(); if (!titulo) return; inp.disabled = true; try { await salvar('tarefas', { titulo, responsavel: SOLO() ? S.eu : fm.dataset.resp, ...(SOLO() && prazoPadrao(fm.dataset.resp) ? { prazo: prazoPadrao(fm.dataset.resp) } : {}), unidade: S.unidade !== 'todas' ? S.unidade : null, ordem: Date.now() }, 'Tarefa criada'); desenhar(); setTimeout(() => $(`#tq form.nova[data-resp="${fm.dataset.resp}"] input`)?.focus(), 0); } catch { inp.disabled = false; } }));
+    ligarTarefas($('#tq'), desenhar);
+  }
+  desenhar();
+}
+function editarTarefa(t0, depois) {
+  const t = { responsavel: S.eu, prioridade: 'normal', status: 'aberta', checklist: [], ...t0 }, novo = !t.id;
+  let ck = (Array.isArray(t.checklist) ? t.checklist : []).map((i) => ({ ...i }));
+  const { v, fechar } = abrirVeu(`<div class="modal"><header><h3>${novo ? 'Nova tarefa' : 'Tarefa'}</h3><button class="x" aria-label="Fechar">×</button></header>
+    <form class="miolo" id="fT">
+      <div><label class="rot">O que fazer *</label><input class="campo" name="titulo" required maxlength="200" value="${esc(t.titulo || '')}"></div>
+      <div class="grade g3">
+        <div><label class="rot">Quem faz</label><select class="campo" name="responsavel">${opResp(t.responsavel, true, '')}</select></div>
+        <div><label class="rot">Prazo</label><input class="campo" type="date" name="prazo" value="${esc(t.prazo || '')}"></div>
+        <div><label class="rot">Prioridade</label><select class="campo" name="prioridade">${opcoes({ baixa: 'Baixa', normal: 'Normal', alta: 'Alta' }, t.prioridade)}</select></div>
+        <div><label class="rot">Situação</label><select class="campo" name="status">${opcoes({ aberta: 'A fazer', fazendo: 'Fazendo', feita: 'Feita' }, t.status)}</select></div>
+        <div><label class="rot">Unidade</label><select class="campo" name="unidade"><option value="">—</option>${opUnid(t.unidade)}</select></div>
+        <div><label class="rot">Contato</label><select class="campo" name="contato_id"><option value="">—</option>${S.contatos.filter((c) => !c.arquivado || c.id === t.contato_id).sort((a, b) => a.nome.localeCompare(b.nome)).map((c) => `<option value="${c.id}" ${c.id === t.contato_id ? 'selected' : ''}>${esc(c.nome)}${c.empresa ? ' · ' + esc(c.empresa) : ''}</option>`).join('')}</select></div>
+      </div>
+      <div><label class="rot">Detalhes</label><textarea class="campo" name="descricao" maxlength="4000">${esc(t.descricao || '')}</textarea></div>
+      <div><label class="rot">Checklist</label><div id="ckL"></div><div style="display:flex;gap:6px;margin-top:4px"><input class="campo" id="ckN" placeholder="Adicionar item…"><button type="button" class="btn peq" id="ckB">+</button></div></div>
+      <div id="tHist" class="muted peq"></div>
+      <footer style="padding:0;border:0">${novo ? '' : '<button type="button" class="btn perigo" id="tApagar" style="margin-right:auto">Apagar</button>'}<button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri">Salvar</button></footer>
+    </form></div>`, true);
+  const ckRender = () => { $('#ckL', v).innerHTML = ck.map((i, n) => `<div class="check-it"><input type="checkbox" data-n="${n}" ${i.f ? 'checked' : ''}><input type="text" class="campo" data-n="${n}" value="${esc(i.t)}" style="padding:4px 8px"><button type="button" class="x" data-del="${n}" aria-label="Remover">×</button></div>`).join('');
+    $$('#ckL input[type=checkbox]', v).forEach((x) => (x.onchange = () => (ck[x.dataset.n].f = x.checked))); $$('#ckL input[type=text]', v).forEach((x) => (x.oninput = () => (ck[x.dataset.n].t = x.value))); $$('#ckL [data-del]', v).forEach((x) => (x.onclick = () => { ck.splice(x.dataset.del, 1); ckRender(); })); };
+  ckRender();
+  const addCk = () => { const s = $('#ckN', v).value.trim(); if (!s) return; ck.push({ t: s, f: false }); $('#ckN', v).value = ''; ckRender(); $('#ckN', v).focus(); };
+  $('#ckB', v).onclick = addCk; $('#ckN', v).onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); addCk(); } };
+  if (novo) $('[name=titulo]', v).focus();
+  else A.historicoTarefa(t.id).then((h) => { const AC = { criou: 'criou', passou: 'passou', concluiu: 'concluiu', reabriu: 'reabriu', status: 'mudou a situação' }; const nm = (x) => x === 'ambos' ? 'os dois' : (pessoa(x)?.nome || x || '—'); $('#tHist', v).innerHTML = h.map((x) => `<div>• ${esc(nm(x.autor))} ${AC[x.acao]}${x.acao === 'passou' ? ` de ${esc(nm(x.de))} para ${esc(nm(x.para))}` : x.acao === 'criou' ? ` para ${esc(nm(x.para))}` : ''} · ${data(x.em, true)}</div>`).join(''); }).catch(() => {});
+  $('#tApagar', v)?.addEventListener('click', async () => { if (!confirm('Apagar esta tarefa?')) return; try { await A.apagar('tarefas', t.id); S.tarefas = S.tarefas.filter((x) => x.id !== t.id); contadores(); fechar(); depois ? depois() : render(); toast('Tarefa apagada'); } catch (e) { falha(e); } });
+  $('#fT', v).onsubmit = async (e) => {
+    e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); Object.keys(d).forEach((k) => (d[k] = d[k].trim() || null));
+    d.checklist = ck.filter((i) => i.t.trim()).map((i) => ({ t: i.t.trim().slice(0, 200), f: !!i.f }));
+    if (!d.responsavel) d.responsavel = SOLO() ? S.eu : 'ambos';
+    try { await salvar('tarefas', novo ? { ...d, ordem: Date.now() } : { id: t.id, ...d }, novo ? 'Tarefa criada' : 'Tarefa salva'); fechar(); depois ? depois() : render(); } catch {}
+  };
+}
+
+// ---------- trabalhos (antiga aba Projetos: trabalhos de clientes) ----------
+function vTrabalhos(el) {
+  const f = S.filtros; f.pstatus = f.pstatus ?? 'ativos';
+  el.innerHTML = `<div class="filtros"><div class="seg">${[['ativos', 'Ativos'], ['publicado', 'Publicados'], ['todos', 'Todos']].map(([k, n]) => `<button data-s="${k}" class="${f.pstatus === k ? 'ativo' : ''}">${n}</button>`).join('')}</div></div><div id="pAlvo"></div>`;
+  $$('.seg button', el).forEach((b) => (b.onclick = () => { f.pstatus = b.dataset.s; render(); }));
+  const lista = S.projetos.filter((p) => doFiltroUnidade(p) && (f.pstatus === 'todos' || (f.pstatus === 'publicado' ? ['publicado', 'manutencao'].includes(p.status) : !['publicado', 'manutencao', 'cancelado'].includes(p.status))));
+  const h = hoje();
+  $('#pAlvo').innerHTML = `<div class="cartao rolagem"><table class="tab"><thead><tr><th>Trabalho</th><th>Cliente</th><th>Tipo</th><th>Situação</th><th>Prazo</th><th>Valor</th><th>Resp.</th><th>Links</th></tr></thead><tbody>${lista.sort((a, b) => (a.prazo || '9999').localeCompare(b.prazo || '9999')).map((p) => { const c = S.contatos.find((x) => x.id === p.contato_id);
+    return `<tr data-id="${p.id}"><td><b>${esc(p.nome)}</b>${S.unidade === 'todas' ? `<div>${chipUnidade(p.unidade)}</div>` : ''}</td><td>${c ? esc(c.empresa || c.nome) : '<span class="muted">—</span>'}</td><td>${esc(PTIPOS[p.tipo] || p.tipo)}</td><td><span class="chip ${p.status === 'publicado' ? 'verde' : ''}">${esc((PSTATUS.find((s) => s[0] === p.status) || [])[1] || p.status)}</span></td><td>${p.prazo ? `<span class="chip ${p.prazo < h && !['publicado', 'manutencao', 'cancelado'].includes(p.status) ? 'alerta' : ''}">${data(p.prazo)}</span>` : ''}</td><td>${moeda(p.valor, p.moeda)}</td><td>${avatar(p.responsavel)}</td><td>${p.link_previa ? `<a href="${esc(p.link_previa)}" target="_blank" rel="noopener" data-link>prévia</a> ` : ''}${p.link_publicado ? `<a href="${esc(p.link_publicado)}" target="_blank" rel="noopener" data-link>site</a>` : ''}</td></tr>`; }).join('')}</tbody></table>${lista.length ? '' : '<p class="vazio">Nenhum trabalho aqui. Use “+ Novo” para criar.</p>'}</div>`;
+  $$('tr[data-id]', el).forEach((tr) => (tr.onclick = (e) => { if (e.target.closest('[data-link]')) return; editarProjeto(S.projetos.find((p) => p.id === tr.dataset.id)); }));
+}
+const urlSegura = (u) => { if (!u) return null; u = u.trim(); if (!/^https?:\/\//i.test(u)) u = 'https://' + u; try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : null; } catch { return null; } };
+function editarProjeto(p0, depois) {
+  const p = { tipo: 'site', status: 'briefing', moeda: 'BRL', unidade: S.unidade !== 'todas' ? S.unidade : 'atlas-leads', responsavel: S.eu, ...p0 }, novo = !p.id;
+  const { v, fechar } = abrirVeu(`<div class="modal"><header><h3>${novo ? 'Novo trabalho' : 'Trabalho'}</h3><button class="x" aria-label="Fechar">×</button></header>
+    <form class="miolo" id="fP"><div><label class="rot">Nome *</label><input class="campo" name="nome" required maxlength="120" value="${esc(p.nome || '')}"></div>
+    <div class="grade g3">
+      <div><label class="rot">Tipo</label><select class="campo" name="tipo">${opcoes(PTIPOS, p.tipo)}</select></div>
+      <div><label class="rot">Situação</label><select class="campo" name="status">${opcoes(Object.fromEntries(PSTATUS), p.status)}</select></div>
+      <div><label class="rot">Prazo</label><input class="campo" type="date" name="prazo" value="${esc(p.prazo || '')}"></div>
+      <div><label class="rot">Valor</label><input class="campo" type="number" min="0" name="valor" value="${p.valor ?? ''}"></div>
+      <div><label class="rot">Moeda</label><select class="campo" name="moeda">${opcoes({ BRL: 'R$', EUR: '€', USD: 'US$' }, p.moeda)}</select></div>
+      <div><label class="rot">Responsável</label><select class="campo" name="responsavel">${opResp(p.responsavel)}</select></div>
+      <div><label class="rot">Unidade</label><select class="campo" name="unidade">${opUnid(p.unidade)}</select></div>
+      <div style="grid-column:span 2"><label class="rot">Cliente</label><select class="campo" name="contato_id"><option value="">—</option>${S.contatos.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map((c) => `<option value="${c.id}" ${c.id === p.contato_id ? 'selected' : ''}>${esc(c.nome)}${c.empresa ? ' · ' + esc(c.empresa) : ''}</option>`).join('')}</select></div>
+    </div>
+    <div class="grade g2"><div><label class="rot">Link da prévia</label><input class="campo" name="link_previa" value="${esc(p.link_previa || '')}" placeholder="https://…vercel.app"></div><div><label class="rot">Link publicado</label><input class="campo" name="link_publicado" value="${esc(p.link_publicado || '')}" placeholder="https://cliente.com.br"></div></div>
+    <div><label class="rot">Notas</label><textarea class="campo" name="notas">${esc(p.notas || '')}</textarea></div>
+    <footer style="padding:0;border:0">${novo ? '' : '<button type="button" class="btn perigo" id="pApagar">Apagar</button><button type="button" class="btn" id="pPasta" style="margin-right:auto">📁 Pasta do trabalho</button>'}<button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri">Salvar</button></footer></form></div>`, true);
+  $('#pPasta', v)?.addEventListener('click', () => { fechar(); pastaDoProjeto(p); });
+  $('#pApagar', v)?.addEventListener('click', async () => { if (!confirm('Apagar este trabalho?')) return; try { await A.apagar('projetos', p.id); S.projetos = S.projetos.filter((x) => x.id !== p.id); fechar(); depois ? depois() : render(); } catch (e) { falha(e); } });
+  $('#fP', v).onsubmit = async (e) => {
+    e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); Object.keys(d).forEach((k) => (d[k] = d[k].trim() || null));
+    d.valor = d.valor == null ? null : Number(d.valor); d.link_previa = urlSegura(d.link_previa); d.link_publicado = urlSegura(d.link_publicado);
+    try { await salvar('projetos', novo ? d : { id: p.id, ...d }, novo ? 'Trabalho criado' : 'Trabalho salvo'); fechar(); depois ? depois() : render(); } catch {}
+  };
+}
+
+// ---------- e-mails ----------
+function vEmails(el) {
+  const f = S.filtros; f.econta = f.econta || ''; f.elidos = f.elidos || 'todos';
+  const contas = [...new Set(S.emails.map((e) => e.conta))];
+  el.innerHTML = `<div class="filtros"><select class="campo" id="fec"><option value="">Todas as contas</option>${contas.map((c) => `<option ${c === f.econta ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select><div class="seg">${[['todos', 'Todas'], ['nlidos', 'Não lidas']].map(([k, n]) => `<button data-l="${k}" class="${f.elidos === k ? 'ativo' : ''}">${n}</button>`).join('')}</div><input class="campo" id="feq" placeholder="Filtrar por assunto ou remetente…" value="${esc(f.eq || '')}"><span class="muted peq" style="margin-left:auto">Chegam sozinhos do Gmail a cada 10 min</span><button class="btn pri peq" id="bNovoEmail">✉️ Novo e-mail</button></div><div class="cartao"><div class="lista-itens" id="eL"></div></div>`;
+  $('#fec').onchange = (e) => { f.econta = e.target.value; desenhar(); };
+  $('#feq').oninput = (e) => { f.eq = e.target.value; desenhar(); };
+  $('#bNovoEmail').onclick = () => escreverEmail({ acao: 'enviar', depois: () => render() });
+  $$('.seg button', el).forEach((b) => (b.onclick = () => { f.elidos = b.dataset.l; render(); }));
+  function desenhar() {
+    const q = (f.eq || '').toLowerCase(), grupos = new Map();
+    S.emails.filter((e) => doFiltroUnidade(e) && (!f.econta || e.conta === f.econta) && (!q || [e.assunto, e.de, e.de_nome, e.para, e.trecho].some((x) => String(x || '').toLowerCase().includes(q)))).forEach((e) => { const k = e.conta + '|' + (e.thread_id || e.id); if (!grupos.has(k)) grupos.set(k, []); grupos.get(k).push(e); });
+    let ths = [...grupos.values()].map((g) => g.sort((a, b) => (a.data < b.data ? 1 : -1)));
+    if (f.elidos === 'nlidos') ths = ths.filter((g) => g.some((e) => !e.lido && e.direcao === 'recebido'));
+    ths.sort((a, b) => (a[0].data < b[0].data ? 1 : -1));
+    $('#eL').innerHTML = ths.slice(0, 300).map((g) => { const e = g[0], nl = g.some((x) => !x.lido && x.direcao === 'recebido'), c = S.contatos.find((x) => x.id === (g.find((y) => y.contato_id) || {}).contato_id), quem = g.find((x) => x.direcao === 'recebido') || e;
+      return `<div data-e="${e.id}" style="align-items:flex-start"><div style="flex:1;min-width:0"><div class="${nl ? 'nlido' : ''}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(quem.de_nome || quem.de)}${g.length > 1 ? ` <span class="muted">(${g.length})</span>` : ''} · ${esc(e.assunto || '(sem assunto)')}</div><div class="muted peq" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.direcao === 'enviado' ? '↗ você: ' : ''}${esc(e.trecho || '')}</div><div class="rapidos" style="margin-top:4px"><span class="chip">${esc(e.conta)}</span>${c ? `<span class="chip verde">👤 ${esc(c.nome)}</span>` : '<span class="chip">sem contato</span>'}</div></div><span class="muted peq">${relativo(e.data)}</span></div>`; }).join('') || `<p class="vazio">${S.emails.length ? 'Nada com esses filtros.' : 'Nenhum e-mail ainda. Instale o script do Gmail (LEIA-ME, passo 5).'}</p>`;
+    $$('#eL [data-e]').forEach((d) => (d.onclick = () => abrirEmail(d.dataset.e, desenhar)));
+  }
+  desenhar();
+}
+async function abrirEmail(id, depois) {
+  let base = S.emails.find((e) => e.id === id);
+  let thread = base ? S.emails.filter((e) => e.conta === base.conta && e.thread_id && e.thread_id === base.thread_id) : [];
+  if (!thread.length) thread = base ? [base] : [];
+  thread.sort((a, b) => (a.data < b.data ? -1 : 1));
+  const { v, fechar } = abrirVeu(`<div class="gaveta"><header><div style="flex:1;min-width:0"><h2>${esc((base || {}).assunto || 'E-mail')}</h2><div class="muted peq">${esc((base || {}).conta || '')}</div></div><button class="x" aria-label="Fechar">×</button></header><div class="miolo" id="eM"><div class="giro" style="margin:20px auto"></div></div></div>`);
+  try {
+    const completos = await Promise.all((thread.length ? thread : [{ id }]).map((e) => A.email(e.id)));
+    const ext = completos.find((e) => e.direcao === 'recebido') || completos[0];
+    const ligado = completos.find((e) => e.contato_id)?.contato_id, c = ligado && S.contatos.find((x) => x.id === ligado);
+    $('#eM', v).innerHTML = `<div class="secao" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${c ? `<span>Contato: <b>${esc(c.nome)}</b></span><button class="btn peq" id="eAbrirC">Abrir ficha</button>` : `<span class="muted">Sem contato ligado.</span><select class="campo" id="eLigar" style="width:auto;flex:1;min-width:160px"><option value="">Ligar a um contato…</option>${S.contatos.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map((x) => `<option value="${x.id}">${esc(x.nome)}${x.email ? ' · ' + esc(x.email) : ''}</option>`).join('')}</select>`}</div>` +
+      completos.map((e) => `<div class="secao"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;margin-bottom:8px"><b>${e.direcao === 'enviado' ? '↗ ' + esc(e.enviado_por ? (pessoa(e.enviado_por)?.nome || e.enviado_por) + ' (pelo CRM)' : 'Atlas Hub') : esc(e.de_nome || e.de)}</b><span class="muted peq">${esc(e.direcao === 'enviado' ? 'para ' + (e.para || '') : e.de)}</span><span class="muted peq" style="margin-left:auto">${data(e.data, true)}</span></div><div class="email-corpo">${esc(e.corpo || e.trecho || '')}</div></div>`).join('') + `<div class="secao" id="eResp"></div>`;
+    caixaResposta($('#eResp', v), { conta: ext.conta, thread_id: ext.thread_id, para: extrairEmail(ext.direcao === 'recebido' ? ext.de : ext.para), assunto: 'Re: ' + (ext.assunto || '').replace(/^re:\s*/i, ''), contato: c, unidade: ext.unidade || c?.unidade, depois: async () => { fechar(); try { await carregarTudo(); } catch {} depois?.(); abrirEmail(id, depois); } });
+    $('#eAbrirC', v)?.addEventListener('click', () => { fechar(); abrirContato(c.id); });
+    $('#eLigar', v)?.addEventListener('change', async (ev) => { const cid = ev.target.value; if (!cid) return; try { await Promise.all(completos.map((e) => A.ligarEmail(e.id, cid))); completos.forEach((e) => { const l = S.emails.find((x) => x.id === e.id); if (l) l.contato_id = cid; }); toast('E-mail ligado ao contato'); fechar(); abrirEmail(id, depois); } catch (e) { falha(e); } });
+    const naoLidos = completos.filter((e) => !e.lido);
+    if (naoLidos.length) { await Promise.all(naoLidos.map((e) => A.marcarLido(e.id))); naoLidos.forEach((e) => { const l = S.emails.find((x) => x.id === e.id); if (l) l.lido = true; }); contadores(); depois?.(); }
+  } catch (e) { $('#eM', v).innerHTML = `<p class="vazio">${esc(A.mensagem(e))}</p>`; }
+}
+// ---------- escrever e responder (sai do Gmail de verdade) ----------
+const preencherModelo = (t, c) => String(t || '').replace(/\{nome\}/g, (c?.nome || '').replace(/^Exemplo · /, '').split(' ')[0] || '').replace(/\{empresa\}/g, c?.empresa || c?.nome || 'sua empresa');
+const opModelos = () => '<option value="">Usar um modelo…</option>' + S.modelos.slice().sort((a, b) => (a.ordem || 0) - (b.ordem || 0)).map((m) => `<option value="${m.id}">${esc(m.titulo)}${m.idioma !== 'pt-BR' ? ' · ' + esc(m.idioma) : ''}</option>`).join('');
+async function caixaResposta(box, o) {
+  const contas = await A.contasEnvio();
+  if (!contas.includes(o.conta)) {
+    box.innerHTML = `<h3>Responder</h3><p class="muted peq" style="margin:0 0 8px">O envio pelo CRM ainda não está ligado para a conta <b>${esc(o.conta)}</b> (LEIA-ME, passo 5c). Por enquanto, responda pelo seu e-mail:</p><a class="btn peq" href="mailto:${esc(o.para)}?subject=${encodeURIComponent(o.assunto)}">Abrir no meu e-mail</a>`;
+    return;
+  }
+  box.innerHTML = `<h3>Responder <span class="muted peq" style="text-transform:none;letter-spacing:0;font-weight:500">sai do Gmail ${esc(o.conta)}, na mesma conversa</span></h3>
+    <select class="campo" id="rMod" style="margin-bottom:8px">${opModelos()}</select>
+    <textarea class="campo" id="rTx" rows="6" placeholder="Escreva a resposta para ${esc(o.para)}…"></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px;align-items:center"><span class="muted peq" id="rInfo"></span><button class="btn pri" id="rEnv" style="margin-left:auto">Enviar resposta</button></div>`;
+  $('#rMod', box).onchange = (e) => { const m = S.modelos.find((x) => x.id === e.target.value); if (m) { $('#rTx', box).value = preencherModelo(m.corpo, o.contato); $('#rTx', box).focus(); } e.target.value = ''; };
+  $('#rEnv', box).onclick = async () => {
+    const corpo = $('#rTx', box).value.trim(); if (!corpo) return $('#rTx', box).focus();
+    const b = $('#rEnv', box); b.disabled = true; b.textContent = 'Enviando…';
+    try { await A.enviarEmail({ acao: 'responder', conta: o.conta, thread_id: o.thread_id, para: o.para, assunto: o.assunto, corpo, contato_id: o.contato?.id || null, unidade: o.unidade || null }); toast('Resposta enviada ✔'); o.depois?.(); }
+    catch (e) { falha(e); b.disabled = false; b.textContent = 'Enviar resposta'; }
+  };
+}
+async function escreverEmail(o) {
+  const contas = await A.contasEnvio(), c = o.contato;
+  if (!contas.length) {
+    if (c?.email) { location.href = `mailto:${encodeURIComponent(c.email)}`; return; }
+    return toast('O envio pelo CRM ainda não está ligado (LEIA-ME, passo 5c).', 'erro');
+  }
+  const { v, fechar } = abrirVeu(`<div class="modal" style="width:min(640px,100%)"><header><h3>Novo e-mail</h3><button class="x" aria-label="Fechar">×</button></header>
+    <form class="miolo" id="fEm">
+      <div class="grade g2"><div><label class="rot">Enviar pela conta</label><select class="campo" name="conta">${contas.map((x) => `<option ${x === (o.conta || (c?.unidade === 'ortoo' && contas.includes('ortoo') ? 'ortoo' : contas[0])) ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></div>
+      <div><label class="rot">Para *</label><input class="campo" name="para" type="email" required value="${esc(o.para || c?.email || '')}" ${c?.email ? '' : 'list="lEmails"'}><datalist id="lEmails">${S.contatos.filter((x) => x.email).map((x) => `<option value="${esc(x.email)}">${esc(x.nome)}</option>`).join('')}</datalist></div></div>
+      <div><label class="rot">Assunto *</label><input class="campo" name="assunto" required maxlength="200" value="${esc(o.assunto || '')}"></div>
+      <select class="campo" id="emMod">${opModelos()}</select>
+      <div><label class="rot">Mensagem *</label><textarea class="campo" name="corpo" rows="9" required></textarea></div>
+      <p class="muted peq" style="margin:0">Sai do Gmail da conta escolhida e fica salvo no CRM${c ? ', no histórico de ' + esc(c.nome) : ''}.</p>
+      <footer style="padding:0;border:0"><button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri" id="emEnv">Enviar</button></footer>
+    </form></div>`, true);
+  (c?.email ? $('[name=assunto]', v) : $('[name=para]', v)).focus();
+  $('#emMod', v).onchange = (e) => { const m = S.modelos.find((x) => x.id === e.target.value); const alvo = c || S.contatos.find((x) => x.email && x.email === $('[name=para]', v).value.trim().toLowerCase()); if (m) { $('[name=corpo]', v).value = preencherModelo(m.corpo, alvo); if (m.assunto && !$('[name=assunto]', v).value) $('[name=assunto]', v).value = preencherModelo(m.assunto, alvo); } e.target.value = ''; };
+  $('#fEm', v).onsubmit = async (e) => {
+    e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); const b = $('#emEnv', v); b.disabled = true; b.textContent = 'Enviando…';
+    const para = d.para.trim().toLowerCase(), alvo = c || S.contatos.find((x) => x.email && x.email === para);
+    try { await A.enviarEmail({ acao: 'enviar', conta: d.conta, para, assunto: d.assunto.trim(), corpo: d.corpo.trim(), contato_id: alvo?.id || null, unidade: alvo?.unidade || null }); toast('E-mail enviado ✔'); fechar(); try { await carregarTudo(); } catch {} o.depois?.(); }
+    catch (err) { falha(err); b.disabled = false; b.textContent = 'Enviar'; }
+  };
+}
+const extrairEmail = (s) => { const m = String(s || '').match(/<([^>]+)>/); return (m ? m[1] : String(s || '').split(',')[0]).trim(); };
+
+// ---------- pastas e arquivos ----------
+const STS = { pendente: ['○', 'Pendente'], feito: ['✔', 'Feito'], duvida: ['?', 'Dúvida'] };
+const botaoStatus = (st, extra = '') => `<button type="button" class="st st-${st || 'pendente'}" data-st title="${STS[st || 'pendente'][1]} · toque para marcar" aria-label="${STS[st || 'pendente'][1]}" ${extra}>${st === 'feito' ? '✔' : st === 'duvida' ? '?' : ''}</button>`;
+const tamanho = (b) => !b ? '' : b < 1024 * 1024 ? Math.max(1, Math.round(b / 1024)) + ' KB' : (b / 1024 / 1024).toFixed(1).replace('.', ',') + ' MB';
+const ehImg = (a) => /^image\//.test(a.tipo || ''), ehVideo = (a) => /^video\//.test(a.tipo || '');
+const iconeArq = (a) => ehImg(a) ? '🖼' : ehVideo(a) ? '🎬' : /pdf/.test(a.tipo || '') ? '📄' : /zip|rar|7z/.test(a.tipo || '') ? '🗜' : /sheet|excel|csv/.test(a.tipo || '') ? '📊' : /word|document|text/.test(a.tipo || '') ? '📝' : '📎';
+const pastasFilhas = (pid) => S.pastas.filter((p) => (p.pai_id || null) === (pid || null) && (pid || S.unidade === 'todas' || !p.unidade || p.unidade === S.unidade)).sort((a, b) => a.nome.localeCompare(b.nome, 'pt', { numeric: true }));
+const arquivosDe = (pid) => S.arquivos.filter((a) => a.pasta_id === pid).sort((a, b) => a.nome.localeCompare(b.nome, 'pt', { numeric: true }));
+function subarvore(pid) { const ids = [pid]; for (let i = 0; i < ids.length; i++) S.pastas.forEach((p) => { if (p.pai_id === ids[i]) ids.push(p.id); }); return ids; }
+function progresso(pid) { const ids = new Set(subarvore(pid)); const arqs = S.arquivos.filter((a) => ids.has(a.pasta_id)); return { total: arqs.length, feitos: arqs.filter((a) => a.status === 'feito').length, duvidas: arqs.filter((a) => a.status === 'duvida').length }; }
+function trilha(pid) { const out = []; let p = S.pastas.find((x) => x.id === pid); while (p) { out.unshift(p); p = S.pastas.find((x) => x.id === p.pai_id); } return out; }
+const proximoStatus = (st) => (st === 'feito' ? 'pendente' : 'feito');
+
+function vPastas(el) {
+  const f = S.filtros; f.astatus = f.astatus || 'todos';
+  const pid = S.pastaAtual && S.pastas.some((p) => p.id === S.pastaAtual) ? S.pastaAtual : null; S.pastaAtual = pid;
+  const atual = pid && S.pastas.find((p) => p.id === pid);
+  const subs = pastasFilhas(pid);
+  const arqs = pid ? arquivosDe(pid).filter((a) => f.astatus === 'todos' || (f.astatus === 'pendente' ? a.status !== 'feito' : a.status === f.astatus)) : [];
+  const todosArqs = pid ? arquivosDe(pid) : [];
+  const pendentes = todosArqs.filter((a) => a.status !== 'feito');
+  const cardPasta = (p) => { const g = progresso(p.id), n = S.pastas.filter((x) => x.pai_id === p.id).length, pj = p.projeto_id && S.projetos.find((x) => x.id === p.projeto_id);
+    return `<div class="pasta cartao" data-pasta="${p.id}">${botaoStatus(p.status)}<div class="pasta-corpo"><div class="pasta-nome">📁 ${esc(p.nome)}</div>
+      <div class="muted peq">${g.total} arquivo${g.total === 1 ? '' : 's'}${n ? ` · ${n} pasta${n > 1 ? 's' : ''}` : ''}${g.duvidas ? ` · <span style="color:var(--alerta)">${g.duvidas} com dúvida</span>` : ''}${pj ? ` · trabalho ${esc(pj.nome)}` : ''}</div>
+      ${g.total ? `<div class="barra"><div style="width:${(g.feitos / g.total) * 100}%"></div></div><div class="muted peq">${g.feitos} de ${g.total} ✔</div>` : ''}
+      ${!pid && S.unidade === 'todas' && p.unidade ? `<div style="margin-top:6px">${chipUnidade(p.unidade)}</div>` : ''}</div></div>`; };
+  el.innerHTML = `
+    <div class="filtros" style="align-items:center">
+      <div class="trilha"><button class="btn peq fant" data-ir-pasta="">📁 Pastas</button>${trilha(pid).map((p) => `<span class="muted">/</span><button class="btn peq fant" data-ir-pasta="${p.id}">${esc(p.nome)}</button>`).join('')}</div>
+      <span style="margin-left:auto"></span>
+      ${pid ? `<button class="btn peq" id="bSubPasta">+ Subpasta</button><button class="btn peq" id="bEditPasta">Editar pasta</button>` : '<button class="btn pri" id="bNovaPasta">+ Nova pasta</button>'}
+    </div>
+    ${atual ? `<div class="secao" style="margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px"><h3 style="font-size:17px;text-transform:none;letter-spacing:0;color:var(--txt);margin:0">📁 ${esc(atual.nome)}</h3>${atual.descricao ? `<div class="muted peq" style="margin-top:3px;white-space:pre-wrap">${esc(atual.descricao)}</div>` : ''}
+          <div class="muted peq" style="margin-top:3px">${atual.status === 'feito' && atual.feito_por ? `Pasta concluída por ${esc(pessoa(atual.feito_por)?.nome || atual.feito_por)} · ${data(atual.feito_em, true)}` : `Criada por ${esc(pessoa(atual.criado_por)?.nome || atual.criado_por || '—')}`}</div></div>
+        <div class="seg" id="stPasta">${Object.entries(STS).map(([k, [ic, n]]) => `<button data-v="${k}" class="${atual.status === k ? 'ativo' : ''}">${k === 'pendente' ? '' : ic + ' '}${k === 'feito' ? 'Pasta concluída' : n}</button>`).join('')}</div>
+      </div>
+      <label class="soltar" id="soltar"><input type="file" id="inArq" multiple hidden><b>⬆ Subir arquivos</b><span class="muted peq">Toque para escolher (fotos, vídeos, PDFs…) ou arraste aqui · até 50 MB cada</span></label>
+      <div class="filtros" style="margin-top:12px">
+        <div class="seg">${[['todos', 'Todos'], ['pendente', 'Pendentes'], ['feito', '✔ Feitos'], ['duvida', '? Dúvida']].map(([k, n]) => `<button data-af="${k}" class="${f.astatus === k ? 'ativo' : ''}">${n} <small class="muted">${k === 'todos' ? todosArqs.length : todosArqs.filter((a) => (k === 'pendente' ? a.status !== 'feito' : a.status === k)).length}</small></button>`).join('')}</div>
+        ${pendentes.length ? `<button class="btn pri peq" id="bPostar" style="margin-left:auto">▶ Abrir pendentes (${pendentes.length})</button>` : ''}
+      </div>` : ''}
+    ${subs.length ? `<div class="pastas-grade">${subs.map(cardPasta).join('')}</div>` : ''}
+    ${pid ? `<div class="arqs-grade" id="arqs">${arqs.map((a) => `<div class="arq cartao ${a.status === 'feito' ? 'feito' : ''}" data-arq="${a.id}">
+        <div class="thumb" data-abrir>${ehImg(a) ? `<img alt="" loading="lazy" data-cam="${esc(a.caminho)}">` : ehVideo(a) ? `<video muted playsinline preload="metadata" data-cam="${esc(a.caminho)}"></video><span class="play">▶</span>` : `<span class="ic-arq">${iconeArq(a)}</span>`}${a.status === 'feito' ? '<span class="selo">✔ Feito</span>' : a.status === 'duvida' ? '<span class="selo duv">? Dúvida</span>' : ''}</div>
+        <div class="arq-pe">${botaoStatus(a.status)}<div style="min-width:0;flex:1" data-abrir><div class="arq-nome">${esc(a.nome)}</div><div class="muted peq">${a.status === 'feito' && a.feito_por ? '✔ ' + esc(pessoa(a.feito_por)?.nome || a.feito_por) + ' · ' + relativo(a.feito_em) : tamanho(a.tamanho)}${a.nota ? ' · 💬' : ''}</div></div></div></div>`).join('')}</div>
+      ${arqs.length ? '' : `<p class="vazio">${todosArqs.length ? 'Nada com esse filtro.' : 'Pasta vazia. Suba os arquivos acima.'}</p>`}` : (subs.length ? '' : '<p class="vazio">Nenhuma pasta ainda. Crie uma para guardar os stories, materiais de clientes e o que mais precisarem.</p>')}`;
+
+  $$('[data-ir-pasta]', el).forEach((b) => (b.onclick = () => { S.pastaAtual = b.dataset.irPasta || null; render(); }));
+  $$('.pasta', el).forEach((c) => c.addEventListener('click', async (e) => {
+    const p = S.pastas.find((x) => x.id === c.dataset.pasta); if (!p) return;
+    if (e.target.closest('[data-st]')) { try { await salvar('pastas', { id: p.id, status: proximoStatus(p.status) }); } catch {} return render(); }
+    S.pastaAtual = p.id; S.filtros.astatus = 'todos'; render(); window.scrollTo(0, 0);
+  }));
+  $('#bNovaPasta')?.addEventListener('click', () => editarPasta({}));
+  $('#bSubPasta')?.addEventListener('click', () => editarPasta({ pai_id: pid, unidade: atual?.unidade }));
+  $('#bEditPasta')?.addEventListener('click', () => editarPasta(atual));
+  $$('#stPasta button', el).forEach((b) => (b.onclick = async () => { try { await salvar('pastas', { id: pid, status: b.dataset.v }, b.dataset.v === 'feito' ? 'Pasta marcada como concluída ✔' : ''); } catch {} render(); }));
+  $$('[data-af]', el).forEach((b) => (b.onclick = () => { f.astatus = b.dataset.af; render(); }));
+  $('#bPostar')?.addEventListener('click', () => abrirArquivo(pendentes[0].id, pendentes.map((a) => a.id), true));
+  if (pid) {
+    $('#inArq').onchange = (e) => { subir([...e.target.files], pid); e.target.value = ''; };
+    const z = $('#soltar');
+    ['dragenter', 'dragover'].forEach((t) => z.addEventListener(t, (e) => { e.preventDefault(); z.classList.add('sobre'); }));
+    ['dragleave', 'drop'].forEach((t) => z.addEventListener(t, () => z.classList.remove('sobre')));
+    z.addEventListener('drop', (e) => { e.preventDefault(); subir([...e.dataTransfer.files], pid); });
+    $$('.arq', el).forEach((c) => c.addEventListener('click', async (e) => {
+      const a = S.arquivos.find((x) => x.id === c.dataset.arq); if (!a) return;
+      if (e.target.closest('[data-st]')) { const novo = proximoStatus(a.status); try { await salvar('arquivos', { id: a.id, status: novo }); if (novo === 'feito') toast('✔ ' + a.nome, '', { rot: 'Desfazer', fn: async () => { await salvar('arquivos', { id: a.id, status: 'pendente' }); render(); } }); } catch {} return render(); }
+      if (e.target.closest('[data-abrir]')) abrirArquivo(a.id, arqs.map((x) => x.id));
+    }));
+    miniaturas(arqs, el);
+  }
+}
+async function miniaturas(arqs, raiz) {
+  const vis = arqs.filter((a) => ehImg(a) || ehVideo(a)); if (!vis.length) return;
+  try { const u = await A.urlsArquivos(vis); $$('[data-cam]', raiz).forEach((m) => { const url = u[m.dataset.cam]; if (url) m.src = ehVideoEl(m) ? url + '#t=0.5' : url; }); } catch (e) { console.warn(e); }
+}
+const ehVideoEl = (m) => m.tagName === 'VIDEO';
+let subindo = false;
+async function subir(files, pid) {
+  files = files.filter((x) => x && x.size >= 0); if (!files.length) return;
+  if (subindo) return toast('Espere terminar o envio anterior.');
+  const grandes = files.filter((x) => x.size > A.LIMITE); if (grandes.length) toast(`${grandes.length} arquivo(s) acima de 50 MB ficaram de fora`, 'erro');
+  files = files.filter((x) => x.size <= A.LIMITE); if (!files.length) return;
+  subindo = true; const z = $('#soltar'); let ok = 0, erro = 0;
+  for (let i = 0; i < files.length; i++) {
+    if (z) z.querySelector('b').textContent = `Enviando ${i + 1} de ${files.length}…`;
+    try { const r = await A.subirArquivo(pid, files[i]); const j = S.arquivos.findIndex((x) => x.id === r.id); if (j >= 0) S.arquivos[j] = r; else S.arquivos.push(r); ok++; } catch (e) { erro++; console.error(e); if (erro === 1) falha(e); }
+  }
+  subindo = false; toast(`${ok} arquivo${ok === 1 ? '' : 's'} enviado${ok === 1 ? '' : 's'}${erro ? ` · ${erro} com erro` : ''}`, erro ? 'erro' : '');
+  if (S.view === 'pastas') render();
+}
+function editarPasta(p0) {
+  const p = { unidade: S.unidade !== 'todas' ? S.unidade : 'atlas-leads', ...p0 }, novo = !p.id;
+  const desc = novo ? new Set() : new Set(subarvore(p.id));
+  const { v, fechar } = abrirVeu(`<div class="modal"><header><h3>${novo ? (p.pai_id ? 'Nova subpasta' : 'Nova pasta') : 'Editar pasta'}</h3><button class="x" aria-label="Fechar">×</button></header>
+    <form class="miolo" id="fPa"><div><label class="rot">Nome *</label><input class="campo" name="nome" required maxlength="120" value="${esc(p.nome || '')}" placeholder="Ex.: Stories semana 2 · Atlas Leads"></div>
+    <div class="grade g2"><div><label class="rot">Unidade</label><select class="campo" name="unidade"><option value="">—</option>${opUnid(p.unidade)}</select></div>
+    <div><label class="rot">Trabalho (opcional)</label><select class="campo" name="projeto_id"><option value="">—</option>${S.projetos.map((x) => `<option value="${x.id}" ${x.id === p.projeto_id ? 'selected' : ''}>${esc(x.nome)}</option>`).join('')}</select></div>
+    <div style="grid-column:1/-1"><label class="rot">Dentro de</label><select class="campo" name="pai_id"><option value="">Pastas (início)</option>${S.pastas.filter((x) => !desc.has(x.id)).map((x) => `<option value="${x.id}" ${x.id === p.pai_id ? 'selected' : ''}>${esc(trilha(x.id).map((t) => t.nome).join(' / '))}</option>`).join('')}</select></div></div>
+    <div><label class="rot">O que tem aqui / instruções</label><textarea class="campo" name="descricao" placeholder="Ex.: postar 1 story por dia às 18h, marcar ✔ depois de postar">${esc(p.descricao || '')}</textarea></div>
+    <footer style="padding:0;border:0">${novo ? '' : '<button type="button" class="btn perigo" id="paApagar" style="margin-right:auto">Apagar pasta</button>'}<button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri">${novo ? 'Criar' : 'Salvar'}</button></footer></form></div>`, true);
+  $('[name=nome]', v).focus();
+  $('#paApagar', v)?.addEventListener('click', async () => {
+    const ids = new Set(subarvore(p.id)), arqs = S.arquivos.filter((a) => ids.has(a.pasta_id));
+    if (!confirm(`Apagar a pasta "${p.nome}"${ids.size > 1 ? `, ${ids.size - 1} subpasta(s)` : ''}${arqs.length ? ` e ${arqs.length} arquivo(s)` : ''}? Não tem volta.`)) return;
+    try { await A.apagarArquivos(arqs); await A.apagar('pastas', p.id); S.arquivos = S.arquivos.filter((a) => !ids.has(a.pasta_id)); S.pastas = S.pastas.filter((x) => !ids.has(x.id)); S.pastaAtual = p.pai_id || null; fechar(); render(); toast('Pasta apagada'); } catch (e) { falha(e); }
+  });
+  $('#fPa', v).onsubmit = async (e) => {
+    e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); Object.keys(d).forEach((k) => (d[k] = d[k].trim() || null));
+    try { const r = await salvar('pastas', novo ? d : { id: p.id, ...d }, novo ? 'Pasta criada' : 'Pasta salva'); fechar(); S.pastaAtual = r.id; if (S.view !== 'pastas') irPara('pastas'); else render(); } catch {}
+  };
+}
+function abrirArquivo(id, ids, modoPostar) {
+  let i = Math.max(0, ids.indexOf(id)); let blob = null, blobDe = null;
+  const { v, fechar } = abrirVeu(`<div class="visor" role="dialog"><header><button class="x" aria-label="Fechar">×</button><div id="vTit" style="flex:1;min-width:0"></div><span class="muted peq" id="vPos"></span></header>
+    <div class="visor-midia" id="vMidia"></div><button class="visor-nav ant" id="vAnt" aria-label="Anterior">‹</button><button class="visor-nav prox" id="vProx" aria-label="Próximo">›</button>
+    <div class="visor-pe" id="vPe"></div></div>`, true);
+  v.classList.add('escuro');
+  const desenhar = async () => {
+    const a = S.arquivos.find((x) => x.id === ids[i]); if (!a) return fechar();
+    blob = null; blobDe = a.id;
+    $('#vTit', v).innerHTML = `<b style="word-break:break-word">${esc(a.nome)}</b><div class="peq" style="opacity:.7">${tamanho(a.tamanho)} · enviado por ${esc(pessoa(a.criado_por)?.nome || a.criado_por || '—')} ${relativo(a.criado_em)}</div>`;
+    $('#vPos', v).textContent = ids.length > 1 ? `${i + 1} de ${ids.length}` : '';
+    $('#vAnt', v).hidden = i === 0; $('#vProx', v).hidden = i >= ids.length - 1;
+    $('#vMidia', v).innerHTML = '<div class="giro"></div>';
+    const podeComp = !!(navigator.share && navigator.canShare);
+    $('#vPe', v).innerHTML = `<div class="seg" id="vSt">${Object.entries(STS).map(([k, [ic, n]]) => `<button data-v="${k}" class="${a.status === k ? 'ativo' : ''}">${k === 'pendente' ? n : ic + ' ' + (k === 'feito' ? 'Feito' : n)}</button>`).join('')}</div>
+      ${a.status === 'feito' && a.feito_por ? `<div class="peq" style="opacity:.8">✔ por ${esc(pessoa(a.feito_por)?.nome || a.feito_por)} · ${data(a.feito_em, true)}</div>` : ''}
+      <div class="visor-acoes">${podeComp ? '<button class="btn pri" id="vComp">📤 Compartilhar / postar</button>' : ''}<button class="btn" id="vBaixar" title="Baixar">⬇<span class="rot-m"> Baixar</span></button><button class="btn" id="vNota" title="Nota">💬<span class="rot-m"> ${a.nota ? 'Ver nota' : 'Nota'}</span></button><button class="btn" id="vRen" title="Renomear">✏️<span class="rot-m"> Renomear</span></button><button class="btn" id="vMover" title="Mover">↪<span class="rot-m"> Mover</span></button><button class="btn perigo" id="vApagar" title="Apagar">🗑<span class="rot-m"> Apagar</span></button></div>
+      <div id="vNotaBox" ${a.nota ? '' : 'hidden'} style="width:100%;max-width:520px"><textarea class="campo" id="vNotaTx" placeholder="Ex.: postado às 18h · legenda usada · falta aprovar">${esc(a.nota || '')}</textarea><div style="text-align:right;margin-top:6px"><button class="btn peq pri" id="vNotaOk">Salvar nota</button></div></div>`;
+    $$('#vSt button', v).forEach((b) => (b.onclick = async () => {
+      try { await salvar('arquivos', { id: a.id, status: b.dataset.v }); } catch { return; }
+      if (b.dataset.v === 'feito' && modoPostar) { const prox = ids.findIndex((x, j) => j > i && S.arquivos.find((y) => y.id === x)?.status !== 'feito'); toast('✔ ' + a.nome); if (prox > 0) { i = prox; return desenhar(); } toast('Tudo da pasta marcado ✔ 🎉'); }
+      desenhar(); if (S.view === 'pastas') render();
+    }));
+    const pegarBlob = async () => { if (blob && blobDe === a.id) return blob; const b = await A.blobArquivo(a); if (blobDe === a.id) blob = b; return b; };
+    $('#vBaixar', v).onclick = async () => { try { const b = await pegarBlob(); const u = URL.createObjectURL(b); const l = document.createElement('a'); l.href = u; l.download = a.nome; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); } catch (e) { falha(e); } };
+    $('#vComp', v)?.addEventListener('click', async () => {
+      try { const b = await pegarBlob(); const fl = new File([b], a.nome, { type: a.tipo || b.type }); if (!navigator.canShare({ files: [fl] })) return toast('Este aparelho não compartilha esse tipo de arquivo. Use Baixar.', 'erro'); await navigator.share({ files: [fl], title: a.nome }); if (a.status !== 'feito') toast('Postou? Toque em ✔ Feito.'); }
+      catch (e) { if (e?.name === 'AbortError') return; if (e?.name === 'NotAllowedError') return toast('Toque em Compartilhar de novo (o arquivo já carregou).'); falha(e); }
+    });
+    $('#vNota', v).onclick = () => { $('#vNotaBox', v).hidden = false; $('#vNotaTx', v).focus(); };
+    $('#vNotaOk', v).onclick = async () => { try { await salvar('arquivos', { id: a.id, nota: $('#vNotaTx', v).value.trim() || null }, 'Nota salva'); if (S.view === 'pastas') render(); } catch {} };
+    $('#vRen', v).onclick = async () => { const n = prompt('Novo nome do arquivo:', a.nome); if (!n || !n.trim() || n.trim() === a.nome) return; try { await salvar('arquivos', { id: a.id, nome: n.trim().slice(0, 200) }); desenhar(); if (S.view === 'pastas') render(); } catch {} };
+    $('#vMover', v).onclick = () => {
+      const { v: v2, fechar: f2 } = abrirVeu(`<div class="modal"><header><h3>Mover para…</h3><button class="x">×</button></header><div class="miolo"><select class="campo" id="mvSel">${S.pastas.filter((x) => x.id !== a.pasta_id).map((x) => `<option value="${x.id}">${esc(trilha(x.id).map((t) => t.nome).join(' / '))}</option>`).join('')}</select></div><footer><button class="btn" data-fechar>Cancelar</button><button class="btn pri" id="mvOk">Mover</button></footer></div>`, true);
+      $('#mvOk', v2).onclick = async () => { const dest = $('#mvSel', v2).value; if (!dest) return; try { await salvar('arquivos', { id: a.id, pasta_id: dest }, 'Arquivo movido'); f2(); ids.splice(i, 1); if (!ids.length) fechar(); else { i = Math.min(i, ids.length - 1); desenhar(); } if (S.view === 'pastas') render(); } catch {} };
+    };
+    $('#vApagar', v).onclick = async () => { if (!confirm(`Apagar "${a.nome}"? Não tem volta.`)) return; try { await A.apagarArquivos([a]); S.arquivos = S.arquivos.filter((x) => x.id !== a.id); ids.splice(i, 1); toast('Arquivo apagado'); if (S.view === 'pastas') render(); if (!ids.length) return fechar(); i = Math.min(i, ids.length - 1); desenhar(); } catch (e) { falha(e); } };
+    try {
+      const u = (await A.urlsArquivos([a]))[a.caminho]; if (blobDe !== a.id) return;
+      $('#vMidia', v).innerHTML = !u ? `<p>Arquivo não encontrado.</p>` : ehImg(a) ? `<img src="${esc(u)}" alt="${esc(a.nome)}">` : ehVideo(a) ? `<video src="${esc(u)}" controls playsinline preload="metadata"></video>` : `<div style="text-align:center"><div style="font-size:64px">${iconeArq(a)}</div><a class="btn" href="${esc(u)}" target="_blank" rel="noopener">Abrir arquivo</a></div>`;
+      if (podeComp && a.tamanho < 30 * 1024 * 1024) pegarBlob().catch(() => {}); // já deixa pronto para compartilhar no celular
+    } catch (e) { $('#vMidia', v).innerHTML = `<p>${esc(A.mensagem(e))}</p>`; }
+  };
+  $('#vAnt', v).onclick = () => { if (i > 0) { i--; desenhar(); } };
+  $('#vProx', v).onclick = () => { if (i < ids.length - 1) { i++; desenhar(); } };
+  const teclas = (e) => { if (!document.body.contains(v)) return document.removeEventListener('keydown', teclas); if (e.target.closest('textarea,input')) return; if (e.key === 'ArrowLeft') $('#vAnt', v).click(); if (e.key === 'ArrowRight') $('#vProx', v).click(); };
+  document.addEventListener('keydown', teclas);
+  let x0 = null; v.addEventListener('touchstart', (e) => { if (e.target.closest('#vMidia')) x0 = e.touches[0].clientX; }, { passive: true });
+  v.addEventListener('touchend', (e) => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 60) (dx < 0 ? $('#vProx', v) : $('#vAnt', v)).click(); });
+  desenhar();
+}
+async function pastaDoProjeto(p) {
+  let pa = S.pastas.find((x) => x.projeto_id === p.id);
+  if (!pa) { try { pa = await salvar('pastas', { nome: p.nome, unidade: p.unidade, projeto_id: p.id }, 'Pasta do trabalho criada'); } catch { return; } }
+  S.pastaAtual = pa.id; irPara('pastas');
+}
+
+// ---------- projetos internos (rodando, futuros, ideias) ----------
+const PLST = [['ideia', 'Ideias', '#a855f7'], ['futuro', 'Futuros', '#0ea5e9'], ['rodando', 'Rodando', '#16a34a'], ['pausado', 'Pausados', '#f59e0b'], ['concluido', 'Concluídos', '#9ca3af']];
+const PLN = Object.fromEntries(PLST.map(([k, n, c]) => [k, { n, c }]));
+const faltam = (d) => { if (!d) return ''; const dias = Math.round((new Date(d + 'T12:00:00') - new Date(hoje() + 'T12:00:00')) / 864e5); return dias > 1 ? `começa em ${dias} dias` : dias === 1 ? 'começa amanhã' : dias === 0 ? 'começa hoje' : `começou há ${-dias} dia${dias === -1 ? '' : 's'}`; };
+function vProjetos(el) {
+  const f = S.filtros; f.plq = f.plq || '';
+  const lista = S.planos.filter((p) => (S.unidade === 'todas' || !p.unidade || p.unidade === S.unidade) && (!f.plq || (p.nome + ' ' + (p.descricao || '') + ' ' + (p.ideias || '')).toLowerCase().includes(f.plq.toLowerCase())));
+  el.innerHTML = `<div class="filtros"><input class="campo" id="fplq" placeholder="Filtrar projetos…" value="${esc(f.plq)}"><span class="muted peq">Projetos da Apex Hub: o que está rodando, o que vem aí (com data de início) e as ideias.</span><button class="btn pri peq" id="bNovoPl" style="margin-left:auto">+ Projeto</button></div>
+    <div class="quadro">${PLST.map(([k, n, cor]) => { const it = lista.filter((p) => p.status === k).sort((a, b) => k === 'futuro' ? (a.data_inicio || '9999').localeCompare(b.data_inicio || '9999') : (b.atualizado_em || '').localeCompare(a.atualizado_em || ''));
+      return `<section class="coluna" data-st="${k}"><header><span class="ponto" style="background:${cor}"></span>${n}<small>${it.length}</small></header><div class="itens">${it.map((p) => { const ps = Array.isArray(p.passos) ? p.passos : [], pf = ps.filter((x) => x.f).length;
+        return `<div class="lead" draggable="true" data-pl="${p.id}"><div class="nome">${avatar(p.responsavel, 20)}<span>${esc(p.nome)}</span></div>${p.descricao ? `<div class="sub">${esc(p.descricao)}</div>` : ''}<div class="pe">${p.data_inicio ? `<span class="chip ${k === 'futuro' && p.data_inicio <= hoje() ? 'alerta' : ''}">📅 ${data(p.data_inicio)}${k === 'futuro' ? ' · ' + faltam(p.data_inicio) : ''}</span>` : ''}${ps.length ? `<span class="chip">☑ ${pf}/${ps.length}</span>` : ''}${p.ideias ? '<span class="chip">💡</span>' : ''}${S.unidade === 'todas' && p.unidade ? `<span class="ponto" title="${esc(unidade(p.unidade).nome)}" style="background:${esc(unidade(p.unidade).cor)}"></span>` : ''}</div></div>`; }).join('') || '<p class="vazio" style="padding:10px">—</p>'}</div></section>`; }).join('')}</div>`;
+  $('#fplq').oninput = (e) => { f.plq = e.target.value; const pos = e.target.selectionStart; render(); const i = $('#fplq'); i.focus(); i.setSelectionRange(pos, pos); };
+  $('#bNovoPl').onclick = () => editarPlano({});
+  $$('[data-pl]', el).forEach((d) => { d.onclick = () => editarPlano(S.planos.find((p) => p.id === d.dataset.pl)); d.ondragstart = (e) => e.dataTransfer.setData('text/plain', d.dataset.pl); });
+  $$('.coluna', el).forEach((col) => { col.ondragover = (e) => { e.preventDefault(); col.classList.add('sobre'); }; col.ondragleave = () => col.classList.remove('sobre');
+    col.ondrop = async (e) => { e.preventDefault(); col.classList.remove('sobre'); const id = e.dataTransfer.getData('text/plain'), p = S.planos.find((x) => x.id === id); if (!p || p.status === col.dataset.st) return; try { await salvar('planos', { id, status: col.dataset.st }, `${p.nome} → ${PLN[col.dataset.st].n}`); } catch {} render(); }; });
+}
+function editarPlano(p0, depois) {
+  const p = { status: 'ideia', responsavel: S.eu, unidade: S.unidade !== 'todas' ? S.unidade : (S.unidades[0]?.id || null), passos: [], ...p0 }, novo = !p.id;
+  let ps = (Array.isArray(p.passos) ? p.passos : []).map((x) => ({ ...x }));
+  const { v, fechar } = abrirVeu(`<div class="modal" style="width:min(640px,100%)"><header><h3>${novo ? 'Novo projeto' : 'Projeto'}</h3><button class="x" aria-label="Fechar">×</button></header>
+    <form class="miolo" id="fPl"><div><label class="rot">Nome do projeto *</label><input class="campo" name="nome" required maxlength="120" value="${esc(p.nome || '')}" placeholder="Ex.: LeadScope 2.0"></div>
+    <div class="grade g3"><div><label class="rot">Situação</label><select class="campo" name="status">${opcoes(Object.fromEntries(PLST.map(([k, n]) => [k, n.replace(/s$/, '').replace('Ideia', 'Ideia').replace('Futuro', 'Futuro (com data)')])), p.status)}</select></div>
+    <div><label class="rot">Data de início</label><input class="campo" type="date" name="data_inicio" value="${esc(p.data_inicio || '')}"></div>
+    <div><label class="rot">Quem toca</label><select class="campo" name="responsavel">${opResp(p.responsavel)}</select></div>
+    <div><label class="rot">Unidade</label><select class="campo" name="unidade"><option value="">—</option>${opUnid(p.unidade)}</select></div></div>
+    <div><label class="rot">Sobre o projeto</label><textarea class="campo" name="descricao" rows="3" placeholder="O que é, objetivo">${esc(p.descricao || '')}</textarea></div>
+    <div><label class="rot">💡 Ideias</label><textarea class="campo" name="ideias" rows="4" placeholder="Uma ideia por linha">${esc(p.ideias || '')}</textarea></div>
+    <div><label class="rot">🚀 Como começar (passos)</label><div id="plPs"></div><div style="display:flex;gap:6px;margin-top:4px"><input class="campo" id="plN" placeholder="Adicionar passo…"><button type="button" class="btn peq" id="plB">+</button></div></div>
+    <div><label class="rot">Links (um por linha)</label><textarea class="campo" name="links" rows="2">${esc(p.links || '')}</textarea></div>
+    <footer style="padding:0;border:0">${novo ? '' : '<button type="button" class="btn perigo" id="plApagar">Apagar</button><button type="button" class="btn" id="plLemb" style="margin-right:auto">⏰ Lembrete</button>'}<button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri">Salvar</button></footer></form></div>`, true);
+  const desenhar = () => { $('#plPs', v).innerHTML = ps.map((i, n) => `<div class="check-it"><input type="checkbox" data-n="${n}" ${i.f ? 'checked' : ''}><input type="text" class="campo" data-n="${n}" value="${esc(i.t)}" style="padding:4px 8px"><button type="button" class="x" data-del="${n}">×</button></div>`).join('');
+    $$('#plPs input[type=checkbox]', v).forEach((x) => (x.onchange = () => (ps[x.dataset.n].f = x.checked))); $$('#plPs input[type=text]', v).forEach((x) => (x.oninput = () => (ps[x.dataset.n].t = x.value))); $$('#plPs [data-del]', v).forEach((x) => (x.onclick = () => { ps.splice(x.dataset.del, 1); desenhar(); })); };
+  desenhar();
+  const add = () => { const t = $('#plN', v).value.trim(); if (!t) return; ps.push({ t, f: false }); $('#plN', v).value = ''; desenhar(); $('#plN', v).focus(); };
+  $('#plB', v).onclick = add; $('#plN', v).onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); add(); } };
+  if (novo) $('[name=nome]', v).focus();
+  $('#plLemb', v)?.addEventListener('click', () => editarLembrete({ plano_id: p.id, titulo: p.nome }));
+  $('#plApagar', v)?.addEventListener('click', async () => { if (!confirm(`Apagar o projeto "${p.nome}"?`)) return; try { await A.apagar('planos', p.id); S.planos = S.planos.filter((x) => x.id !== p.id); fechar(); depois ? depois() : render(); } catch (e) { falha(e); } });
+  $('#fPl', v).onsubmit = async (e) => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); Object.keys(d).forEach((k) => (d[k] = d[k].trim() || null)); d.passos = ps.filter((x) => x.t.trim()).map((x) => ({ t: x.t.trim().slice(0, 200), f: !!x.f }));
+    try { await salvar('planos', novo ? d : { id: p.id, ...d }, novo ? 'Projeto criado' : 'Projeto salvo'); fechar(); depois ? depois() : render(); } catch {} };
+}
+
+// ---------- lembretes (notificação no celular) ----------
+const REP = { nao: 'Não repete', diario: 'Todo dia', semanal: 'Toda semana', mensal: 'Todo mês' };
+const localISO = (d) => { const x = new Date(d); return new Date(x.getTime() - x.getTimezoneOffset() * 6e4).toISOString().slice(0, 16); };
+function quandoTexto(q) { const d = new Date(q), h = hoje(), dia = localISO(d).slice(0, 10), hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); const amanha = localISO(Date.now() + 864e5).slice(0, 10); return (dia === h ? 'Hoje' : dia === amanha ? 'Amanhã' : d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' }).replace('.', '')) + ' · ' + hora; }
+async function caixaPush(box) {
+  const st = await A.estadoPush();
+  const txt = { ligado: '🔔 Notificações ligadas neste aparelho', desligado: 'Receba os lembretes como notificação neste aparelho', bloqueado: 'As notificações estão bloqueadas neste navegador. Libere nas configurações do site.', sem_suporte: 'Este navegador não recebe notificações. No iPhone: Compartilhar → "Adicionar à Tela de Início" e abra o CRM pelo ícone.' }[st];
+  box.innerHTML = `<div class="secao" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px"><span style="flex:1;min-width:200px">${txt}</span>${st === 'desligado' ? '<button class="btn pri peq" id="pLig">🔔 Ligar notificações</button>' : ''}${st === 'ligado' ? '<button class="btn peq" id="pTes">Enviar teste</button><button class="btn peq fant" id="pDes">Desligar</button>' : ''}</div>`;
+  $('#pLig', box)?.addEventListener('click', async (e) => { e.target.disabled = true; try { await A.ligarPush(); toast('Notificações ligadas ✔'); try { await A.testarPush(); } catch {} } catch (er) { falha(er); } caixaPush(box); });
+  $('#pTes', box)?.addEventListener('click', async () => { try { const r = await A.testarPush(); toast(r?.enviados ? 'Teste enviado ✔' : 'Nenhum aparelho recebeu. Desligue e ligue de novo.'); } catch (e) { falha(e); } });
+  $('#pDes', box)?.addEventListener('click', async () => { try { await A.desligarPush(); toast('Notificações desligadas neste aparelho'); } catch (e) { falha(e); } caixaPush(box); });
+}
+function vLembretes(el) {
+  const f = S.filtros; f.lbq = f.lbq || 'proximos';
+  el.innerHTML = `<div id="pushBox"></div><div class="filtros"><div class="seg">${[['proximos', 'Próximos'], ['meus', 'Só os meus'], ['feitos', 'Concluídos']].map(([k, n]) => `<button data-l="${k}" class="${f.lbq === k ? 'ativo' : ''}">${n}</button>`).join('')}</div><button class="btn pri peq" id="bNovoLb" style="margin-left:auto">+ Lembrete</button></div><div class="cartao"><div class="lista-itens" id="lbL"></div></div>`;
+  caixaPush($('#pushBox'));
+  $$('[data-l]', el).forEach((b) => (b.onclick = () => { f.lbq = b.dataset.l; render(); }));
+  $('#bNovoLb').onclick = () => editarLembrete({});
+  const lista = S.lembretes.filter((l) => f.lbq === 'feitos' ? l.feito : !l.feito && (f.lbq !== 'meus' || l.para === S.eu || l.para === 'ambos')).sort((a, b) => f.lbq === 'feitos' ? (b.quando || '').localeCompare(a.quando || '') : (a.quando || '').localeCompare(b.quando || ''));
+  const agora = Date.now();
+  $('#lbL').innerHTML = lista.map((l) => { const venc = !l.feito && new Date(l.quando) < agora, vin = l.contato_id ? S.contatos.find((c) => c.id === l.contato_id)?.nome : l.plano_id ? S.planos.find((p) => p.id === l.plano_id)?.nome : l.projeto_id ? S.projetos.find((p) => p.id === l.projeto_id)?.nome : '';
+    return `<div data-lb="${l.id}" style="align-items:flex-start">${botaoStatus(l.feito ? 'feito' : 'pendente', 'data-lbok')}<div style="flex:1;min-width:0"><div style="font-weight:600;${l.feito ? 'text-decoration:line-through;color:var(--txt-3)' : ''}">${esc(l.titulo)}</div>${l.nota ? `<div class="muted peq">${esc(l.nota)}</div>` : ''}<div class="rapidos" style="margin-top:5px"><span class="chip ${venc ? 'alerta' : ''}">⏰ ${quandoTexto(l.quando)}</span>${l.repetir !== 'nao' ? `<span class="chip">🔁 ${REP[l.repetir]}</span>` : ''}${vin ? `<span class="chip">🔗 ${esc(vin)}</span>` : ''}</div></div>${avatar(l.para, 24)}</div>`; }).join('') || `<p class="vazio">${f.lbq === 'feitos' ? 'Nenhum concluído.' : 'Nenhum lembrete. Crie um com "+ Lembrete" (ou peça para a IA).'}</p>`;
+  $$('#lbL [data-lb]').forEach((d) => d.addEventListener('click', async (e) => { const l = S.lembretes.find((x) => x.id === d.dataset.lb); if (!l) return; if (e.target.closest('[data-lbok]')) { try { await salvar('lembretes', { id: l.id, feito: !l.feito }, l.feito ? 'Reaberto' : 'Lembrete concluído ✔'); } catch {} return render(); } editarLembrete(l); }));
+}
+function editarLembrete(l0, depois) {
+  const em1h = new Date(Date.now() + 36e5); em1h.setMinutes(0, 0, 0);
+  const l = { para: S.eu, repetir: 'nao', quando: em1h.toISOString(), ...l0 }, novo = !l.id;
+  const { v, fechar } = abrirVeu(`<div class="modal"><header><h3>${novo ? 'Novo lembrete' : 'Lembrete'}</h3><button class="x" aria-label="Fechar">×</button></header>
+    <form class="miolo" id="fLb"><div><label class="rot">Lembrar de *</label><input class="campo" name="titulo" required maxlength="200" value="${esc(l.titulo || '')}" placeholder="Ex.: Ligar para a Pastelaria Sousa"></div>
+    <div class="grade g3"><div style="grid-column:span 2"><label class="rot">Quando *</label><input class="campo" type="datetime-local" name="quando" required value="${esc(localISO(l.quando))}"></div>
+    <div><label class="rot">Para</label><select class="campo" name="para">${opResp(l.para, true, '')}</select></div></div>
+    <div class="rapidos">${[['Em 1 hora', 1], ['Hoje 18h', 'h18'], ['Amanhã 9h', 'a9'], ['Segunda 9h', 's9']].map(([n, k]) => `<button type="button" class="btn peq" data-atalho="${k}">${n}</button>`).join('')}</div>
+    <div class="grade g2"><div><label class="rot">Repetir</label><select class="campo" name="repetir">${opcoes(REP, l.repetir)}</select></div>
+    <div><label class="rot">Ligado a um contato</label><select class="campo" name="contato_id"><option value="">—</option>${S.contatos.filter((c) => !c.arquivado || c.id === l.contato_id).sort((a, b) => a.nome.localeCompare(b.nome)).map((c) => `<option value="${c.id}" ${c.id === l.contato_id ? 'selected' : ''}>${esc(c.nome)}</option>`).join('')}</select></div></div>
+    <div><label class="rot">Detalhes</label><textarea class="campo" name="nota" rows="3">${esc(l.nota || '')}</textarea></div>
+    <p class="muted peq" style="margin:0">Chega como notificação no celular de quem estiver marcado (precisa ligar as notificações em Lembretes, uma vez por aparelho).</p>
+    <footer style="padding:0;border:0">${novo ? '' : '<button type="button" class="btn perigo" id="lbApagar" style="margin-right:auto">Apagar</button>'}<button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri">Salvar</button></footer></form></div>`, true);
+  if (novo && !l.titulo) $('[name=titulo]', v).focus();
+  $$('[data-atalho]', v).forEach((b) => (b.onclick = () => { const d = new Date(), k = b.dataset.atalho; if (k === '1') { d.setHours(d.getHours() + 1); } else if (k === 'h18') { d.setHours(18, 0, 0, 0); } else if (k === 'a9') { d.setDate(d.getDate() + 1); d.setHours(9, 0, 0, 0); } else { d.setDate(d.getDate() + ((8 - d.getDay()) % 7 || 7)); d.setHours(9, 0, 0, 0); } $('[name=quando]', v).value = localISO(d); }));
+  $('#lbApagar', v)?.addEventListener('click', async () => { if (!confirm('Apagar este lembrete?')) return; try { await A.apagar('lembretes', l.id); S.lembretes = S.lembretes.filter((x) => x.id !== l.id); fechar(); depois ? depois() : render(); } catch (e) { falha(e); } });
+  $('#fLb', v).onsubmit = async (e) => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); Object.keys(d).forEach((k) => (d[k] = d[k].trim() || null)); d.quando = new Date(d.quando).toISOString(); if (!d.para) d.para = SOLO() ? S.eu : 'ambos'; if (novo) ['plano_id', 'projeto_id', 'tarefa_id'].forEach((k) => l[k] && (d[k] = l[k]));
+    try { await salvar('lembretes', novo ? d : { id: l.id, ...d }, novo ? 'Lembrete criado ⏰' : 'Lembrete salvo'); fechar(); depois ? depois() : (S.view === 'lembretes' || S.view === 'inicio') && render(); } catch {} };
+}
+
+// ---------- formulários (tabelas tipo planilha; senhas criptografadas) ----------
+const CTIPOS = { texto: 'Texto', email: 'E-mail', senha: 'Senha 🔒', link: 'Link', numero: 'Número', data: 'Data', nota: 'Observação' };
+const chavesCofre = new Map(); // planilha_id -> CryptoKey (só na memória desta aba; some ao recarregar)
+function vFormularios(el) {
+  const pid = S.planilhaAtual && S.planilhas.find((p) => p.id === S.planilhaAtual) ? S.planilhaAtual : null; S.planilhaAtual = pid;
+  if (pid) return abrirPlanilha(el, S.planilhas.find((p) => p.id === pid));
+  const lista = S.planilhas.filter((p) => S.unidade === 'todas' || !p.unidade || p.unidade === S.unidade);
+  el.innerHTML = `<div class="filtros"><span class="muted peq">Tabelas para guardar e-mails, logins, contas e o que mais precisarem. Colunas de senha ficam criptografadas com uma senha-mestra.</span><button class="btn pri peq" id="bNovaPh" style="margin-left:auto">+ Formulário</button></div>
+    <div class="pastas-grade">${lista.map((p) => `<div class="pasta cartao" data-ph="${p.id}"><span style="font-size:24px">${p.cofre ? '🔐' : '📋'}</span><div class="pasta-corpo"><div class="pasta-nome">${esc(p.nome)}</div><div class="muted peq">${(p.colunas || []).length} colunas${p.descricao ? ' · ' + esc(p.descricao) : ''}</div></div></div>`).join('')}</div>${lista.length ? '' : '<p class="vazio">Nenhum formulário ainda.</p>'}`;
+  $('#bNovaPh').onclick = () => editarPlanilha({});
+  $$('[data-ph]', el).forEach((d) => (d.onclick = () => { S.planilhaAtual = d.dataset.ph; render(); }));
+}
+function editarPlanilha(p0) {
+  const p = { colunas: [{ id: 'c' + Date.now().toString(36), nome: 'Nome', tipo: 'texto' }, { id: 'c' + (Date.now() + 1).toString(36), nome: 'E-mail', tipo: 'email' }, { id: 'c' + (Date.now() + 2).toString(36), nome: 'Senha', tipo: 'senha' }], unidade: S.unidade !== 'todas' ? S.unidade : null, ...p0 }, novo = !p.id;
+  let cols = p.colunas.map((c) => ({ ...c }));
+  const { v, fechar } = abrirVeu(`<div class="modal" style="width:min(600px,100%)"><header><h3>${novo ? 'Novo formulário' : 'Editar formulário'}</h3><button class="x" aria-label="Fechar">×</button></header>
+    <form class="miolo" id="fPh"><div class="grade g2"><div><label class="rot">Nome *</label><input class="campo" name="nome" required maxlength="120" value="${esc(p.nome || '')}" placeholder="Ex.: Contas das redes sociais"></div><div><label class="rot">Unidade</label><select class="campo" name="unidade"><option value="">—</option>${opUnid(p.unidade)}</select></div></div>
+    <div><label class="rot">Descrição</label><input class="campo" name="descricao" value="${esc(p.descricao || '')}"></div>
+    <div><label class="rot">Colunas</label><div id="phC"></div><button type="button" class="btn peq" id="phAdd" style="margin-top:6px">+ Coluna</button></div>
+    <div id="phMestra" hidden><label class="rot">Senha-mestra do cofre * (vocês dois usam a mesma; ela NÃO fica salva em lugar nenhum: se esquecerem, as senhas não podem ser recuperadas)</label><input class="campo" type="password" id="phM1" minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres"><input class="campo" type="password" id="phM2" autocomplete="new-password" placeholder="Repita a senha-mestra" style="margin-top:6px"></div>
+    <footer style="padding:0;border:0">${novo ? '' : '<button type="button" class="btn perigo" id="phApagar" style="margin-right:auto">Apagar formulário</button>'}<button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri">Salvar</button></footer></form></div>`, true);
+  const precisaMestra = () => !p.cofre && cols.some((c) => c.tipo === 'senha');
+  const desenhar = () => { $('#phC', v).innerHTML = cols.map((c, i) => `<div class="check-it"><input class="campo" data-i="${i}" value="${esc(c.nome)}" style="padding:5px 8px" placeholder="Nome da coluna"><select class="campo" data-t="${i}" style="width:auto;padding:5px">${opcoes(CTIPOS, c.tipo)}</select><button type="button" class="x" data-del="${i}" title="Remover">×</button></div>`).join('');
+    $$('#phC [data-i]', v).forEach((x) => (x.oninput = () => (cols[x.dataset.i].nome = x.value))); $$('#phC [data-t]', v).forEach((x) => (x.onchange = () => { cols[x.dataset.t].tipo = x.value; $('#phMestra', v).hidden = !precisaMestra(); }));
+    $$('#phC [data-del]', v).forEach((x) => (x.onclick = () => { if (!confirm('Remover esta coluna? Os valores dela somem da tabela.')) return; cols.splice(x.dataset.del, 1); desenhar(); }));
+    $('#phMestra', v).hidden = !precisaMestra(); };
+  desenhar();
+  $('#phAdd', v).onclick = () => { cols.push({ id: 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), nome: '', tipo: 'texto' }); desenhar(); $$('#phC [data-i]', v).pop().focus(); };
+  if (novo) $('[name=nome]', v).focus();
+  $('#phApagar', v)?.addEventListener('click', async () => { if (!confirm(`Apagar "${p.nome}" e todas as linhas? Não tem volta.`)) return; try { await A.apagar('planilhas', p.id); S.planilhas = S.planilhas.filter((x) => x.id !== p.id); S.planilhaAtual = null; fechar(); render(); } catch (e) { falha(e); } });
+  $('#fPh', v).onsubmit = async (e) => {
+    e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); d.nome = d.nome.trim(); d.descricao = d.descricao.trim() || null; d.unidade = d.unidade || null;
+    d.colunas = cols.filter((c) => c.nome.trim()).map((c) => ({ id: c.id, nome: c.nome.trim().slice(0, 60), tipo: c.tipo }));
+    if (!d.colunas.length) return toast('Coloque pelo menos uma coluna.', 'erro');
+    let k = null;
+    if (precisaMestra()) { const m1 = $('#phM1', v).value, m2 = $('#phM2', v).value; if (m1.length < 8) return toast('Senha-mestra com pelo menos 8 caracteres.', 'erro'); if (m1 !== m2) return toast('As senhas-mestras não conferem.', 'erro'); const c = await A.cofre.criar(m1); d.cofre = c.info; k = c.k; }
+    try { const r = await salvar('planilhas', novo ? d : { id: p.id, ...d }, novo ? 'Formulário criado' : 'Formulário salvo'); if (k) chavesCofre.set(r.id, k); fechar(); S.planilhaAtual = r.id; render(); } catch {}
+  };
+}
+async function abrirPlanilha(el, p) {
+  const cols = p.colunas || [], temSenha = cols.some((c) => c.tipo === 'senha'), chave = chavesCofre.get(p.id);
+  el.innerHTML = `<div class="filtros"><div class="trilha"><button class="btn peq fant" id="phVolta">📋 Formulários</button><span class="muted">/</span><b>${esc(p.nome)}</b></div><input class="campo" id="phQ" placeholder="Filtrar…" style="min-width:160px"><span style="margin-left:auto"></span>${temSenha ? (chave ? '<button class="btn peq" id="phTranca">🔓 Trancar senhas</button>' : '<button class="btn peq pri" id="phAbre">🔐 Abrir cofre</button>') : ''}<button class="btn peq" id="phCsv">Exportar CSV</button><button class="btn peq" id="phEd">Editar colunas</button><button class="btn pri peq" id="phNova">+ Linha</button></div>
+    ${p.descricao ? `<p class="muted peq" style="margin:-4px 0 10px">${esc(p.descricao)}</p>` : ''}<div class="cartao rolagem"><table class="tab grade-ph"><thead><tr>${cols.map((c) => `<th>${esc(c.nome)}${c.tipo === 'senha' ? ' 🔒' : ''}</th>`).join('')}<th style="width:40px"></th></tr></thead><tbody id="phB"><tr><td colspan="${cols.length + 1}"><div class="giro" style="margin:14px auto"></div></td></tr></tbody></table></div>
+    <p class="muted peq" style="margin-top:8px">Toque numa célula para editar · salva sozinho${temSenha ? ' · senhas só aparecem com o cofre aberto (a senha-mestra não fica salva)' : ''}.</p>`;
+  $('#phVolta').onclick = () => { S.planilhaAtual = null; render(); };
+  $('#phEd').onclick = () => editarPlanilha(p);
+  $('#phAbre')?.addEventListener('click', () => abrirCofre(p));
+  $('#phTranca')?.addEventListener('click', () => { chavesCofre.delete(p.id); render(); });
+  let linhas = [];
+  try { linhas = await A.linhasPlanilha(p.id); } catch (e) { return falha(e); }
+  if (S.view !== 'formularios' || S.planilhaAtual !== p.id) return;
+  const claro = new Map(); // linha_id+col -> senha decifrada (só na tela)
+  if (chave) for (const l of linhas) for (const c of cols) if (c.tipo === 'senha' && l.valores?.[c.id]?.ct) { try { claro.set(l.id + c.id, await A.cofre.decifrar(chave, l.valores[c.id])); } catch { claro.set(l.id + c.id, '⚠ não abriu'); } }
+  const celula = (l, c) => { const val = l.valores?.[c.id];
+    if (c.tipo === 'senha') { if (!val) return '<span class="muted">—</span>'; return chave ? `<span class="senha-cel"><code>••••••••</code><button class="btn peq fant" data-ver title="Mostrar">👁</button><button class="btn peq fant" data-cop title="Copiar">⧉</button></span>` : '<span class="muted">🔒 ••••••</span>'; }
+    if (!val) return '<span class="muted">—</span>';
+    if (c.tipo === 'link') { const u = urlSegura(val); return u ? `<a href="${esc(u)}" target="_blank" rel="noopener" data-link>${esc(val.replace(/^https?:\/\//, '').slice(0, 40))}</a>` : esc(val); }
+    if (c.tipo === 'email') return `${esc(val)} <button class="btn peq fant" data-cop title="Copiar">⧉</button>`;
+    if (c.tipo === 'data') return esc(data(val));
+    return esc(val); };
+  const desenhar = () => { const q = ($('#phQ').value || '').toLowerCase();
+    const vis = linhas.filter((l) => !q || cols.some((c) => c.tipo !== 'senha' && String(l.valores?.[c.id] ?? '').toLowerCase().includes(q)));
+    $('#phB').innerHTML = vis.map((l) => `<tr data-ln="${l.id}">${cols.map((c) => `<td data-c="${c.id}">${celula(l, c)}</td>`).join('')}<td><button class="x" data-apaga title="Apagar linha">×</button></td></tr>`).join('') || `<tr><td colspan="${cols.length + 1}" class="vazio">${linhas.length ? 'Nada com esse filtro.' : 'Nenhuma linha. Use “+ Linha”.'}</td></tr>`; };
+  desenhar(); $('#phQ').oninput = desenhar;
+  const salvarLinha = async (l, valores) => { try { const r = await A.salvar('planilha_linhas', l.id ? { id: l.id, valores } : { planilha_id: p.id, valores, ordem: Date.now() }); const i = linhas.findIndex((x) => x.id === r.id); if (i >= 0) linhas[i] = r; else linhas.push(r); return r; } catch (e) { falha(e); throw e; } };
+  const editarCelula = async (l, c, td) => {
+    if (c.tipo === 'senha' && !chave) return abrirCofre(p);
+    const atual = c.tipo === 'senha' ? (claro.get(l.id + c.id) || '') : (l.valores?.[c.id] ?? '');
+    const tipoInp = { email: 'email', numero: 'number', data: 'date', senha: 'text', link: 'url' }[c.tipo] || 'text';
+    td.innerHTML = c.tipo === 'nota' ? `<textarea class="campo" rows="3">${esc(atual)}</textarea>` : `<input class="campo" type="${tipoInp}" value="${esc(atual)}" style="padding:5px 8px;min-width:140px" ${c.tipo === 'senha' ? 'autocomplete="off" spellcheck="false"' : ''}>`;
+    const inp = td.firstElementChild; inp.focus(); let feito = false;
+    const fim = async (salva) => { if (feito) return; feito = true; const novo = inp.value.trim();
+      if (salva && novo !== atual) { const valores = { ...(l.valores || {}) }; if (c.tipo === 'senha') { valores[c.id] = novo ? await A.cofre.cifrar(chave, novo) : null; claro.set(l.id + c.id, novo); } else valores[c.id] = novo || null; try { const r = await salvarLinha(l, valores); if (c.tipo === 'senha') claro.set(r.id + c.id, novo); } catch {} }
+      desenhar(); };
+    inp.onblur = () => fim(true); inp.onkeydown = (e) => { if (e.key === 'Enter' && c.tipo !== 'nota') { e.preventDefault(); inp.blur(); } if (e.key === 'Escape') { e.stopPropagation(); fim(false); } };
+  };
+  $('#phB').addEventListener('click', async (e) => {
+    const tr = e.target.closest('tr[data-ln]'); if (!tr) return; const l = linhas.find((x) => x.id === tr.dataset.ln); const td = e.target.closest('td[data-c]'); const c = td && cols.find((x) => x.id === td.dataset.c);
+    if (e.target.closest('[data-apaga]')) { if (!confirm('Apagar esta linha?')) return; try { await A.apagar('planilha_linhas', l.id); linhas = linhas.filter((x) => x.id !== l.id); desenhar(); } catch (er) { falha(er); } return; }
+    if (e.target.closest('[data-link]')) return;
+    if (e.target.closest('[data-ver]')) { const sp = td.querySelector('code'); sp.textContent = sp.textContent.startsWith('•') ? claro.get(l.id + c.id) || '' : '••••••••'; return; }
+    if (e.target.closest('[data-cop]')) return copiar(c.tipo === 'senha' ? claro.get(l.id + c.id) || '' : l.valores?.[c.id] || '');
+    if (c && !td.querySelector('input,textarea')) editarCelula(l, c, td);
+  });
+  $('#phNova').onclick = async () => { try { const r = await salvarLinha({}, {}); desenhar(); const td = $(`#phB tr[data-ln="${r.id}"] td[data-c]`); if (td && cols[0].tipo !== 'senha') editarCelula(r, cols[0], td); } catch {} };
+  $('#phCsv').onclick = () => { if (temSenha && !confirm('O CSV sai SEM as senhas (por segurança). Continuar?')) return; const cel = (v) => { let s = String(v ?? ''); if (/^[=+\-@]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
+    const cs = cols.filter((c) => c.tipo !== 'senha'); const csv = '﻿' + cs.map((c) => cel(c.nome)).join(';') + '\n' + linhas.map((l) => cs.map((c) => cel(l.valores?.[c.id])).join(';')).join('\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = p.nome.replace(/[^\w-]+/g, '-') + '.csv'; a.click(); };
+}
+function abrirCofre(p) {
+  const { v, fechar } = abrirVeu(`<div class="modal" style="width:min(420px,100%)"><header><h3>🔐 Abrir cofre</h3><button class="x" aria-label="Fechar">×</button></header><form class="miolo" id="fCf"><label class="rot">Senha-mestra de "${esc(p.nome)}"</label><input class="campo" type="password" id="cfS" required autocomplete="current-password"><p class="muted peq" style="margin:0">Fica aberto só nesta aba até você trancar ou recarregar a página.</p><footer style="padding:0;border:0"><button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri" id="cfB">Abrir</button></footer></form></div>`, true);
+  $('#cfS', v).focus();
+  $('#fCf', v).onsubmit = async (e) => { e.preventDefault(); const b = $('#cfB', v); b.disabled = true; b.textContent = 'Abrindo…'; try { chavesCofre.set(p.id, await A.cofre.abrir(p.cofre, $('#cfS', v).value)); fechar(); render(); } catch (er) { falha(er); b.disabled = false; b.textContent = 'Abrir'; } };
+}
+
+// ---------- assistente de IA ----------
+const conversaIA = [];
+function abrirIA() {
+  if ($('#iaPainel')) return $('#iaTx').focus();
+  const p = document.createElement('div'); p.id = 'iaPainel'; p.className = 'ia-painel';
+  p.innerHTML = `<header><b>✨ Assistente do CRM</b><span class="muted peq" style="margin-left:6px">cria tarefas, lembretes, contatos e projetos</span><button class="x" id="iaX" aria-label="Fechar" style="margin-left:auto">×</button></header><div class="ia-msgs" id="iaM"></div>
+    <form class="ia-form" id="iaF"><textarea class="campo" id="iaTx" rows="2" placeholder='Ex.: "cria uma tarefa pra amanhã postar os stories" ou "me lembra sexta 9h de ligar pro Jota"'></textarea><button class="btn pri" id="iaB">Enviar</button></form>`;
+  document.body.appendChild(p);
+  const desenhar = () => { $('#iaM').innerHTML = (conversaIA.length ? '' : `<div class="ia-dica">Exemplos:<br>• "quais tarefas estão atrasadas?"<br>• "cadastra a Pizzaria Bella, telefone 47 99999-0000, quer cardápio"<br>• "o que tenho pra fazer hoje?"<br>• "cria o projeto Loja da Mantoo começando dia 1/12"<br>• "me lembra amanhã 10h de mandar a proposta da Rita"</div>`) +
+    conversaIA.map((m) => `<div class="ia-b ${m.papel}">${esc(m.texto).replace(/\n/g, '<br>')}${m.acoes?.length ? `<div class="peq" style="opacity:.75;margin-top:4px">${m.acoes.map((a) => (a.ok ? '✔ ' : '✖ ') + a.ferramenta.replace(/_/g, ' ')).join(' · ')}</div>` : ''}</div>`).join(''); $('#iaM').scrollTop = 1e9; };
+  desenhar(); $('#iaTx').focus();
+  $('#iaX').onclick = () => p.remove();
+  $('#iaTx').onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('#iaF').requestSubmit(); } };
+  $('#iaF').onsubmit = async (e) => {
+    e.preventDefault(); const t = $('#iaTx').value.trim(); if (!t) return; conversaIA.push({ papel: 'eu', texto: t }); $('#iaTx').value = ''; desenhar();
+    const b = $('#iaB'); b.disabled = true; b.textContent = '…'; $('#iaM').insertAdjacentHTML('beforeend', '<div class="ia-b ia" id="iaPensa"><span class="giro" style="width:16px;height:16px;border-width:2px;display:inline-block;vertical-align:middle"></span></div>'); $('#iaM').scrollTop = 1e9;
+    try { const r = await A.ia(conversaIA.slice(-12).map(({ papel, texto }) => ({ papel, texto }))); conversaIA.push({ papel: 'ia', texto: r.texto, acoes: r.acoes }); if (r.acoes?.some((a) => a.ok)) { try { await carregarTudo(); render(); } catch {} } }
+    catch (er) { conversaIA.push({ papel: 'ia', texto: A.mensagem(er) }); }
+    b.disabled = false; b.textContent = 'Enviar'; if ($('#iaPainel')) { desenhar(); $('#iaTx').focus(); }
+  };
+}
+
+// ---------- conectar projetos ----------
+function vConectar(el) {
+  const url = A.config.supabaseUrl || 'https://SEU-PROJETO.supabase.co', anon = A.config.supabaseAnon ? A.config.supabaseAnon.slice(0, 12) + '…' : 'SUA_CHAVE_ANON';
+  el.innerHTML = `<div class="dash">
+    <div class="cartao"><div class="cab"><h3>Link da bio (Instagram e Facebook)</h3></div><div style="padding:14px" class="grade">
+      <p class="muted" style="margin:0">Use um link por rede. Assim o CRM mostra de onde cada lead veio.</p>
+      ${['instagram', 'facebook', 'whatsapp'].map((r) => `<div style="display:flex;gap:6px"><input class="campo" readonly value="${esc(linkForm(r))}"><button class="btn peq" data-cop="${r}">Copiar</button></div>`).join('')}
+    </div></div>
+    <div class="cartao"><div class="cab"><h3>Mandar leads de outro site para o CRM</h3></div><div style="padding:14px" class="grade">
+      <p class="muted" style="margin:0">Qualquer projeto futuro (site de cliente, landing page, Ortoo, LeadScope) pode mandar contatos para cá com a chave pública. Troque <b>unidade</b> pelo projeto certo.</p>
+      <div class="codigo">fetch('${esc(url)}/rest/v1/rpc/enviar_formulario', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', apikey: '${esc(anon)}', Authorization: 'Bearer ${esc(anon)}' },
+  body: JSON.stringify({ p: {
+    unidade: 'ortoo', nome: 'Maria', email: 'maria@ex.com', telefone: '+5547…',
+    empresa: 'Loja X', interesses: ['sistema'], mensagem: '…', utm: { utm_source: 'site-ortoo' }
+  }})
+})</div>
+      <p class="muted peq" style="margin:0">Unidades: ${S.unidades.map((u) => `<code>${esc(u.id)}</code>`).join(', ')}. Para criar uma nova unidade, veja o LEIA-ME (uma linha de SQL).</p>
+    </div></div>
+    <div class="cartao"><div class="cab"><h3>E-mails</h3></div><div style="padding:14px" class="grade">
+      <p class="muted" style="margin:0">Cada conta do Gmail roda o script <b>apps-script/Code.gs</b> e manda as conversas respondidas para cá a cada 10 minutos.</p>
+      <div class="rapidos">${[...new Set(S.emails.map((e) => e.conta))].map((c) => `<span class="chip verde">✔ ${esc(c)} · ${S.emails.filter((e) => e.conta === c).length} e-mails</span>`).join('') || '<span class="chip">Nenhuma conta enviou e-mails ainda</span>'}</div>
+    </div></div>
+    <div class="cartao"><div class="cab"><h3>Unidades / empresas</h3><button class="btn peq" id="bNovaUn">+ Unidade</button></div><div class="lista-itens" id="lUn"></div><p class="muted peq" style="padding:0 14px 12px;margin:0">Cada projeto ou empresa sua pode virar uma unidade: aparece nos filtros, leads, tarefas, trabalhos e formulários.</p></div>
+    <div class="cartao"><div class="cab"><h3>Modelos de e-mail</h3><button class="btn peq" id="bNovoMod">+ Modelo</button></div><div class="lista-itens" id="lMod"></div><p class="muted peq" style="padding:0 14px 12px;margin:0">Use {nome} e {empresa}: o CRM troca pelos dados do contato.</p></div>
+    <div class="cartao"><div class="cab"><h3>Equipe</h3></div><div class="lista-itens">${S.equipe.map((e) => `<div style="cursor:default">${avatar(e.apelido, 26)}<span style="flex:1"><b>${esc(e.nome)}</b> <span class="muted peq">${esc(e.email || '')}</span></span><span class="ponto" style="background:${esc(e.cor)}"></span></div>`).join('')}</div></div>
+  </div>`;
+  $$('[data-cop]', el).forEach((b) => (b.onclick = () => copiar(linkForm(b.dataset.cop))));
+  const desenharMod = () => { $('#lMod').innerHTML = S.modelos.slice().sort((a, b) => (a.ordem || 0) - (b.ordem || 0)).map((m) => `<div data-mod="${m.id}"><span style="flex:1;min-width:0"><b>${esc(m.titulo)}</b> <span class="muted peq">${esc(m.idioma)}</span></span><span class="muted">›</span></div>`).join('') || '<p class="vazio">Nenhum modelo.</p>'; $$('#lMod [data-mod]').forEach((d) => (d.onclick = () => editarModelo(S.modelos.find((m) => m.id === d.dataset.mod), desenharMod))); };
+  desenharMod(); $('#bNovoMod').onclick = () => editarModelo({}, desenharMod);
+  const desenharUn = () => { $('#lUn').innerHTML = S.unidades.slice().sort((a, b) => (a.ordem || 0) - (b.ordem || 0)).map((u) => `<div data-un="${esc(u.id)}"><span class="ponto" style="background:${esc(u.cor)}"></span><span style="flex:1;min-width:0"><b>${esc(u.nome)}</b> <span class="muted peq">${u.ativo === false ? 'arquivada' : esc(u.descricao || '')}</span></span><span class="muted">›</span></div>`).join(''); $$('#lUn [data-un]').forEach((d) => (d.onclick = () => editarUnidade(S.unidades.find((u) => u.id === d.dataset.un), () => desenharUn()))); };
+  desenharUn(); $('#bNovaUn').onclick = () => editarUnidade({}, () => desenharUn());
+}
+function editarModelo(m0, depois) {
+  const m = { idioma: 'pt-BR', ...m0 }, novo = !m.id;
+  const { v, fechar } = abrirVeu(`<div class="modal"><header><h3>${novo ? 'Novo modelo' : 'Modelo'}</h3><button class="x" aria-label="Fechar">×</button></header>
+    <form class="miolo" id="fMod"><div class="grade g2"><div><label class="rot">Nome do modelo *</label><input class="campo" name="titulo" required maxlength="80" value="${esc(m.titulo || '')}"></div>
+    <div><label class="rot">Idioma</label><select class="campo" name="idioma">${opcoes({ 'pt-BR': 'Português (BR)', 'pt-PT': 'Português (PT)', en: 'Inglês' }, m.idioma)}</select></div></div>
+    <div><label class="rot">Assunto (opcional, para e-mail novo)</label><input class="campo" name="assunto" maxlength="200" value="${esc(m.assunto || '')}"></div>
+    <div><label class="rot">Texto *</label><textarea class="campo" name="corpo" rows="8" required>${esc(m.corpo || '')}</textarea></div>
+    <footer style="padding:0;border:0">${novo ? '' : '<button type="button" class="btn perigo" id="modApagar" style="margin-right:auto">Apagar</button>'}<button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri">Salvar</button></footer></form></div>`, true);
+  $('#modApagar', v)?.addEventListener('click', async () => { if (!confirm('Apagar este modelo?')) return; try { await A.apagar('modelos', m.id); S.modelos = S.modelos.filter((x) => x.id !== m.id); fechar(); depois?.(); } catch (e) { falha(e); } });
+  $('#fMod', v).onsubmit = async (e) => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); d.titulo = d.titulo.trim(); d.assunto = d.assunto.trim() || null; d.corpo = d.corpo.trim(); try { await salvar('modelos', novo ? { ...d, ordem: S.modelos.length + 1 } : { id: m.id, ...d }, 'Modelo salvo'); fechar(); depois?.(); } catch {} };
+}
+function linkForm(rede) { const base = A.config.formularioUrl || 'https://SEU-FORMULARIO.vercel.app'; return base.replace(/\/$/, '') + '/?utm_source=' + rede + '&utm_medium=bio'; }
+$('#bLinkForm').onclick = () => { if (!A.config.formularioUrl) toast('Coloque o endereço do formulário no config.js (formularioUrl). Copiei o modelo.'); copiar(linkForm('instagram')); };
+
+// ---------- busca global ----------
+function abrirBusca() {
+  if ($('#buscaG')) return;
+  const { v, fechar } = abrirVeu(`<div class="modal" id="buscaG"><div class="miolo"><input class="campo" id="bgq" placeholder="Buscar contato, empresa, tarefa, trabalho, projeto, e-mail…" autocomplete="off" style="font-size:16px;padding:11px 12px"><div class="busca-res" id="bgr"></div></div></div>`, true);
+  const inp = $('#bgq', v); inp.focus(); let sel = 0, res = [];
+  const run = () => {
+    const q = inp.value.toLowerCase().trim(); res = [];
+    if (q.length >= 2) {
+      S.contatos.forEach((c) => { if ([c.nome, c.empresa, c.email, c.telefone, c.instagram, c.nicho, c.cidade].some((x) => String(x || '').toLowerCase().includes(q))) res.push({ ic: '👤', t: c.nome, s: [c.empresa, ETAPA[c.etapa]?.n].filter(Boolean).join(' · '), go: () => abrirContato(c.id) }); });
+      S.tarefas.forEach((t) => { if (t.titulo.toLowerCase().includes(q)) res.push({ ic: t.status === 'feita' ? '☑' : '☐', t: t.titulo, s: 'Tarefa · ' + (pessoa(t.responsavel)?.nome || ''), go: () => editarTarefa(t) }); });
+      S.planos.forEach((p) => { if ((p.nome + ' ' + (p.ideias || '')).toLowerCase().includes(q)) res.push({ ic: '⭐', t: p.nome, s: 'Projeto · ' + (PLN[p.status]?.n || ''), go: () => editarPlano(p) }); });
+      S.lembretes.forEach((l) => { if (l.titulo.toLowerCase().includes(q)) res.push({ ic: '⏰', t: l.titulo, s: 'Lembrete · ' + quandoTexto(l.quando), go: () => editarLembrete(l) }); });
+      S.planilhas.forEach((p) => { if (p.nome.toLowerCase().includes(q)) res.push({ ic: '📋', t: p.nome, s: 'Formulário', go: () => { S.planilhaAtual = p.id; irPara('formularios'); } }); });
+      S.pastas.forEach((p) => { if (p.nome.toLowerCase().includes(q)) res.push({ ic: '📁', t: p.nome, s: 'Pasta', go: () => { S.pastaAtual = p.id; irPara('pastas'); } }); });
+      S.arquivos.forEach((a) => { if (a.nome.toLowerCase().includes(q) || (a.nota || '').toLowerCase().includes(q)) res.push({ ic: a.status === 'feito' ? '✔' : '🖼', t: a.nome, s: 'Arquivo · ' + (S.pastas.find((p) => p.id === a.pasta_id)?.nome || ''), go: () => abrirArquivo(a.id, [a.id]) }); });
+      S.projetos.forEach((p) => { if (p.nome.toLowerCase().includes(q)) res.push({ ic: '📁', t: p.nome, s: 'Trabalho', go: () => editarProjeto(p) }); });
+      S.emails.forEach((e) => { if ([e.assunto, e.de, e.de_nome].some((x) => String(x || '').toLowerCase().includes(q))) res.push({ ic: '✉️', t: e.assunto || '(sem assunto)', s: e.de_nome || e.de, go: () => abrirEmail(e.id) }); });
+    }
+    res = res.slice(0, 30); sel = 0; desenhar();
+  };
+  const desenhar = () => { $('#bgr', v).innerHTML = res.map((r, i) => `<div data-i="${i}" class="${i === sel ? 'sel' : ''}"><span>${r.ic}</span><span style="flex:1;min-width:0"><b>${esc(r.t)}</b> <span class="muted peq">${esc(r.s)}</span></span></div>`).join('') || (inp.value.trim().length >= 2 ? '<p class="vazio">Nada encontrado.</p>' : '<p class="vazio">Digite pelo menos 2 letras.</p>'); $$('#bgr [data-i]', v).forEach((d) => (d.onclick = () => { fechar(); res[d.dataset.i].go(); })); };
+  inp.oninput = run; run();
+  inp.onkeydown = (e) => { if (e.key === 'ArrowDown') { sel = Math.min(res.length - 1, sel + 1); desenhar(); e.preventDefault(); } if (e.key === 'ArrowUp') { sel = Math.max(0, sel - 1); desenhar(); e.preventDefault(); } if (e.key === 'Enter' && res[sel]) { fechar(); res[sel].go(); } };
+}
+$('#bBusca').onclick = abrirBusca;
+$('#bIA').onclick = abrirIA;
+document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k' && !$('#app').hidden) { e.preventDefault(); abrirBusca(); } });
+
+iniciar();
+})();
+</script>
+</body>
+</html>
