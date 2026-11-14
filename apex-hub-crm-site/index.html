@@ -268,7 +268,7 @@ body:has(.visor) #toasts{bottom:auto;top:16px}
 .grade-ph td{min-width:120px;cursor:text}
 .grade-ph td:last-child{min-width:0}
 .senha-cel{display:inline-flex;align-items:center;gap:2px}
-.senha-cel code{font-family:ui-monospace,Menlo,monospace}
+.senha-cel .sv{font:inherit;color:inherit;letter-spacing:normal}
 .codigo{font:12px/1.5 ui-monospace,Menlo,monospace;background:var(--card-2);border:1px solid var(--linha);border-radius:9px;padding:10px;white-space:pre-wrap;word-break:break-all}
 </style>
 <script src="config.js"></script>
@@ -1270,12 +1270,13 @@ function editarPlanilha(p0) {
 }
 async function abrirPlanilha(el, p) {
   const cols = p.colunas || [], temSenha = cols.some((c) => c.tipo === 'senha'), chave = chavesCofre.get(p.id);
-  el.innerHTML = `<div class="filtros"><div class="trilha"><button class="btn peq fant" id="phVolta">📋 Formulários</button><span class="muted">/</span><b>${esc(p.nome)}</b></div><input class="campo" id="phQ" placeholder="Filtrar…" style="min-width:160px"><span style="margin-left:auto"></span>${temSenha ? (chave ? '<button class="btn peq" id="phTranca">🔓 Trancar senhas</button>' : '<button class="btn peq pri" id="phAbre">🔐 Abrir cofre</button>') : ''}<button class="btn peq" id="phCsv">Exportar CSV</button><button class="btn peq" id="phEd">Editar colunas</button><button class="btn pri peq" id="phNova">+ Linha</button></div>
+  el.innerHTML = `<div class="filtros"><div class="trilha"><button class="btn peq fant" id="phVolta">📋 Formulários</button><span class="muted">/</span><b>${esc(p.nome)}</b></div><input class="campo" id="phQ" placeholder="Filtrar…" style="min-width:160px"><span style="margin-left:auto"></span>${temSenha && p.cofre ? '<button class="btn peq" id="phTroca">🔑 Trocar senha-mestra</button>' : ''}${temSenha ? (chave ? '<button class="btn peq" id="phTranca">🔓 Trancar senhas</button>' : '<button class="btn peq pri" id="phAbre">🔐 Abrir cofre</button>') : ''}<button class="btn peq" id="phCsv">Exportar CSV</button><button class="btn peq" id="phEd">Editar colunas</button><button class="btn pri peq" id="phNova">+ Linha</button></div>
     ${p.descricao ? `<p class="muted peq" style="margin:-4px 0 10px">${esc(p.descricao)}</p>` : ''}<div class="cartao rolagem"><table class="tab grade-ph"><thead><tr>${cols.map((c) => `<th>${esc(c.nome)}${c.tipo === 'senha' ? ' 🔒' : ''}</th>`).join('')}<th style="width:40px"></th></tr></thead><tbody id="phB"><tr><td colspan="${cols.length + 1}"><div class="giro" style="margin:14px auto"></div></td></tr></tbody></table></div>
     <p class="muted peq" style="margin-top:8px">Toque numa célula para editar · salva sozinho${temSenha ? ' · senhas só aparecem com o cofre aberto (a senha-mestra não fica salva)' : ''}.</p>`;
   $('#phVolta').onclick = () => { S.planilhaAtual = null; render(); };
   $('#phEd').onclick = () => editarPlanilha(p);
   $('#phAbre')?.addEventListener('click', () => abrirCofre(p));
+  $('#phTroca')?.addEventListener('click', () => trocarMestra(p));
   $('#phTranca')?.addEventListener('click', () => { chavesCofre.delete(p.id); render(); });
   let linhas = [];
   try { linhas = await A.linhasPlanilha(p.id); } catch (e) { return falha(e); }
@@ -1283,7 +1284,7 @@ async function abrirPlanilha(el, p) {
   const claro = new Map(); // linha_id+col -> senha decifrada (só na tela)
   if (chave) for (const l of linhas) for (const c of cols) if (c.tipo === 'senha' && l.valores?.[c.id]?.ct) { try { claro.set(l.id + c.id, await A.cofre.decifrar(chave, l.valores[c.id])); } catch { claro.set(l.id + c.id, '⚠ não abriu'); } }
   const celula = (l, c) => { const val = l.valores?.[c.id];
-    if (c.tipo === 'senha') { if (!val) return '<span class="muted">—</span>'; return chave ? `<span class="senha-cel"><code>••••••••</code><button class="btn peq fant" data-ver title="Mostrar">👁</button><button class="btn peq fant" data-cop title="Copiar">⧉</button></span>` : '<span class="muted">🔒 ••••••</span>'; }
+    if (c.tipo === 'senha') { if (!val) return '<span class="muted">—</span>'; return chave ? `<span class="senha-cel"><span class="sv">••••••••</span><button class="btn peq fant" data-ver title="Mostrar">👁</button><button class="btn peq fant" data-cop title="Copiar">⧉</button></span>` : '<span class="muted">🔒 ••••••</span>'; }
     if (!val) return '<span class="muted">—</span>';
     if (c.tipo === 'link') { const u = urlSegura(val); return u ? `<a href="${esc(u)}" target="_blank" rel="noopener" data-link>${esc(val.replace(/^https?:\/\//, '').slice(0, 40))}</a>` : esc(val); }
     if (c.tipo === 'email') return `${esc(val)} <button class="btn peq fant" data-cop title="Copiar">⧉</button>`;
@@ -1309,7 +1310,7 @@ async function abrirPlanilha(el, p) {
     const tr = e.target.closest('tr[data-ln]'); if (!tr) return; const l = linhas.find((x) => x.id === tr.dataset.ln); const td = e.target.closest('td[data-c]'); const c = td && cols.find((x) => x.id === td.dataset.c);
     if (e.target.closest('[data-apaga]')) { if (!confirm('Apagar esta linha?')) return; try { await A.apagar('planilha_linhas', l.id); linhas = linhas.filter((x) => x.id !== l.id); desenhar(); } catch (er) { falha(er); } return; }
     if (e.target.closest('[data-link]')) return;
-    if (e.target.closest('[data-ver]')) { const sp = td.querySelector('code'); sp.textContent = sp.textContent.startsWith('•') ? claro.get(l.id + c.id) || '' : '••••••••'; return; }
+    if (e.target.closest('[data-ver]')) { const sp = td.querySelector('.sv'); sp.textContent = sp.textContent.startsWith('•') ? claro.get(l.id + c.id) || '' : '••••••••'; return; }
     if (e.target.closest('[data-cop]')) return copiar(c.tipo === 'senha' ? claro.get(l.id + c.id) || '' : l.valores?.[c.id] || '');
     if (c && !td.querySelector('input,textarea')) editarCelula(l, c, td);
   });
@@ -1317,6 +1318,35 @@ async function abrirPlanilha(el, p) {
   $('#phCsv').onclick = () => { if (temSenha && !confirm('O CSV sai SEM as senhas (por segurança). Continuar?')) return; const cel = (v) => { let s = String(v ?? ''); if (/^[=+\-@]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
     const cs = cols.filter((c) => c.tipo !== 'senha'); const csv = '﻿' + cs.map((c) => cel(c.nome)).join(';') + '\n' + linhas.map((l) => cs.map((c) => cel(l.valores?.[c.id])).join(';')).join('\n');
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = p.nome.replace(/[^\w-]+/g, '-') + '.csv'; a.click(); };
+}
+function trocarMestra(p) {
+  const { v, fechar } = abrirVeu(`<div class="modal" style="width:min(440px,100%)"><header><h3>🔑 Trocar senha-mestra</h3><button class="x" aria-label="Fechar">×</button></header><form class="miolo" id="fTm">
+    <div><label class="rot">Senha-mestra atual</label><input class="campo" type="password" id="tmA" required autocomplete="current-password"></div>
+    <div><label class="rot">Nova senha-mestra (mínimo 8 caracteres)</label><input class="campo" type="password" id="tmN1" required minlength="8" autocomplete="new-password"></div>
+    <div><label class="rot">Repita a nova</label><input class="campo" type="password" id="tmN2" required autocomplete="new-password"></div>
+    <p class="muted peq" style="margin:0">Todas as senhas de "${esc(p.nome)}" são criptografadas de novo com a nova senha-mestra. Ela não fica salva em lugar nenhum: se esquecer, não dá para recuperar.</p>
+    <footer style="padding:0;border:0"><button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri" id="tmB">Trocar</button></footer></form></div>`, true);
+  $('#tmA', v).focus();
+  $('#fTm', v).onsubmit = async (e) => {
+    e.preventDefault(); const n1 = $('#tmN1', v).value, n2 = $('#tmN2', v).value;
+    if (n1.length < 8) return toast('Nova senha-mestra com pelo menos 8 caracteres.', 'erro');
+    if (n1 !== n2) return toast('As novas senhas não conferem.', 'erro');
+    const b = $('#tmB', v); b.disabled = true; b.textContent = 'Trocando…';
+    try {
+      const velha = await A.cofre.abrir(p.cofre, $('#tmA', v).value);
+      const cols = (p.colunas || []).filter((c) => c.tipo === 'senha');
+      const linhas = await A.linhasPlanilha(p.id);
+      const nova = await A.cofre.criar(n1);
+      // decifra tudo antes de gravar qualquer coisa: se algo falhar, nada muda
+      const prontas = [];
+      for (const l of linhas) { let mudou = false; const valores = { ...(l.valores || {}) };
+        for (const c of cols) { const val = valores[c.id]; if (val && val.ct) { valores[c.id] = await A.cofre.cifrar(nova.k, await A.cofre.decifrar(velha, val)); mudou = true; } }
+        if (mudou) prontas.push({ id: l.id, valores }); }
+      for (const r of prontas) await A.salvar('planilha_linhas', r);
+      const r = await salvar('planilhas', { id: p.id, cofre: nova.info }, 'Senha-mestra trocada');
+      chavesCofre.set(p.id, nova.k); fechar(); render();
+    } catch (er) { falha(er); b.disabled = false; b.textContent = 'Trocar'; }
+  };
 }
 function abrirCofre(p) {
   const { v, fechar } = abrirVeu(`<div class="modal" style="width:min(420px,100%)"><header><h3>🔐 Abrir cofre</h3><button class="x" aria-label="Fechar">×</button></header><form class="miolo" id="fCf"><label class="rot">Senha-mestra de "${esc(p.nome)}"</label><input class="campo" type="password" id="cfS" required autocomplete="current-password"><p class="muted peq" style="margin:0">Fica aberto só nesta aba até você trancar ou recarregar a página.</p><footer style="padding:0;border:0"><button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri" id="cfB">Abrir</button></footer></form></div>`, true);
