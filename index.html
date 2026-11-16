@@ -106,6 +106,7 @@ main{min-width:0;display:flex;flex-direction:column}
 .lista-itens>*{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--linha);cursor:pointer}
 .lista-itens>*:last-child{border-bottom:0}
 .lista-itens>*:hover{background:var(--card-2)}
+.fi-linha{align-items:center;gap:12px}.fi-acao{display:flex;align-items:center;gap:10px;white-space:nowrap}@media(max-width:640px){.fi-linha{flex-wrap:wrap}.fi-acao{width:100%;justify-content:space-between}}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
 .kpi{padding:14px 16px}
 .kpi small{display:block;color:var(--txt-2);font-size:12px;font-weight:500}
@@ -268,7 +269,7 @@ body:has(.visor) #toasts{bottom:auto;top:16px}
 .grade-ph td{min-width:120px;cursor:text}
 .grade-ph td:last-child{min-width:0}
 .senha-cel{display:inline-flex;align-items:center;gap:2px}
-.senha-cel code{font:inherit;color:inherit;background:none;padding:0}
+.senha-cel .sv{font:inherit;color:inherit;letter-spacing:normal}
 .codigo{font:12px/1.5 ui-monospace,Menlo,monospace;background:var(--card-2);border:1px solid var(--linha);border-radius:9px;padding:10px;white-space:pre-wrap;word-break:break-all}
 </style>
 <script src="config.js"></script>
@@ -307,6 +308,7 @@ body:has(.visor) #toasts{bottom:auto;top:16px}
     <button class="nav" data-v="leads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7M16 4a4 4 0 010 8M22 21c0-3-2-6-5-7"/></svg>Leads e clientes<span class="cont" id="cLeads" hidden></span></button>
     <button class="nav" data-v="tarefas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 12l3 3 5-6"/></svg>Tarefas<span class="cont" id="cTarefas" hidden></span></button>
     <button class="nav" data-v="lembretes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3L2 6M19 3l3 3"/></svg>Lembretes<span class="cont" id="cLemb" hidden></span></button>
+    <button class="nav" data-v="financeiro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg>Financeiro<span class="cont" id="cFin" hidden></span></button>
     <button class="nav" data-v="trabalhos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Trabalhos</button>
     <button class="nav" data-v="projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>Projetos</button>
     <button class="nav" data-v="objetivos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Meus objetivos</button>
@@ -347,7 +349,7 @@ body:has(.visor) #toasts{bottom:auto;top:16px}
 const A = window.CRM;
 const $ = (s, el = document) => el.querySelector(s), $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const S = { eu: null, equipe: [], unidades: [], contatos: [], tarefas: [], projetos: [], emails: [], pastas: [], arquivos: [], modelos: [], planos: [], lembretes: [], planilhas: [], objetivos: [], planilhaAtual: null, pastaAtual: null, view: 'inicio', unidade: A.local.get('crm-unidade') || 'todas', filtros: {} };
+const S = { eu: null, equipe: [], unidades: [], contatos: [], tarefas: [], projetos: [], emails: [], pastas: [], arquivos: [], modelos: [], planos: [], lembretes: [], planilhas: [], objetivos: [], financeiro: [], planilhaAtual: null, pastaAtual: null, view: 'inicio', unidade: A.local.get('crm-unidade') || 'todas', filtros: {} };
 const ETAPAS = [['novo', 'Novo', '#64748b'], ['em_contato', 'Em contato', '#0ea5e9'], ['proposta', 'Proposta enviada', '#a855f7'], ['negociacao', 'Negociação', '#f59e0b'], ['fechado', 'Fechado', '#16a34a'], ['perdido', 'Perdido', '#9ca3af']];
 const ETAPA = Object.fromEntries(ETAPAS.map(([k, n, c]) => [k, { n, c }]));
 const ORIGENS = { formulario: 'Formulário', email: 'E-mail', manual: 'Manual', instagram: 'Instagram', whatsapp: 'WhatsApp', indicacao: 'Indicação', anuncio: 'Anúncio', outro: 'Outro' };
@@ -438,7 +440,7 @@ function contadores() {
   const novos = S.contatos.filter((c) => c.etapa === 'novo' && !c.arquivado).length;
   const minhas = S.tarefas.filter((t) => t.status !== 'feita' && (t.responsavel === S.eu || t.responsavel === 'ambos')).length;
   const nl = S.emails.filter((e) => !e.lido && e.direcao === 'recebido').length;
-  [['#cLeads', novos], ['#cTarefas', minhas], ['#cEmails', nl], ['#cPastas', (S.arquivos || []).filter((a) => a.status === 'duvida').length], ['#cLemb', (S.lembretes || []).filter((l) => !l.feito && new Date(l.quando) < new Date() && (l.para === S.eu || l.para === 'ambos')).length]].forEach(([s, n]) => { $(s).hidden = !n; $(s).textContent = n; });
+  [['#cLeads', novos], ['#cTarefas', minhas], ['#cEmails', nl], ['#cPastas', (S.arquivos || []).filter((a) => a.status === 'duvida').length], ['#cLemb', (S.lembretes || []).filter((l) => !l.feito && new Date(l.quando) < new Date() && (l.para === S.eu || l.para === 'ambos')).length], ['#cFin', (S.financeiro || []).filter((f) => f.ativo && diasPara(f.vencimento) <= 3).length]].forEach(([s, n]) => { $(s).hidden = !n; $(s).textContent = n; });
 }
 async function salvar(tabela, row, msg) {
   try { const r = await A.salvar(tabela, row); const lista = S[tabela]; const i = lista.findIndex((x) => x.id === r.id); if (i >= 0) lista[i] = r; else lista.unshift(r); contadores(); if (msg) toast(msg); return r; }
@@ -446,13 +448,13 @@ async function salvar(tabela, row, msg) {
 }
 
 // ---------- navegação ----------
-const TITULOS = { inicio: 'Início', leads: 'Leads e clientes', tarefas: 'Tarefas', trabalhos: 'Trabalhos', projetos: 'Projetos', emails: 'E-mails', pastas: 'Pastas', lembretes: 'Lembretes', formularios: 'Formulários', conectar: 'Conectar projetos', objetivos: 'Meus objetivos' };
+const TITULOS = { inicio: 'Início', leads: 'Leads e clientes', tarefas: 'Tarefas', trabalhos: 'Trabalhos', projetos: 'Projetos', emails: 'E-mails', pastas: 'Pastas', lembretes: 'Lembretes', financeiro: 'Financeiro', formularios: 'Formulários', conectar: 'Conectar projetos', objetivos: 'Meus objetivos' };
 function irPara(v, inicial) { if (!TITULOS[v]) v = 'inicio'; S.view = v; if (!inicial || hashAtual() !== v) trocarEndereco('#' + v); $$('.nav').forEach((n) => n.classList.toggle('ativo', n.dataset.v === v)); $('#titulo').textContent = TITULOS[v]; $('#lado').classList.remove('aberto'); render(); }
 $$('.nav').forEach((n) => (n.onclick = () => irPara(n.dataset.v)));
 $('#bMenu').onclick = () => $('#lado').classList.toggle('aberto');
 window.addEventListener('hashchange', () => { const v = hashAtual(); if (v && v !== S.view && !$('#app').hidden) irPara(v); });
-function render() { const f = { inicio: vInicio, leads: vLeads, tarefas: vTarefas, trabalhos: vTrabalhos, projetos: vProjetos, emails: vEmails, pastas: vPastas, lembretes: vLembretes, formularios: vFormularios, conectar: vConectar, objetivos: vObjetivos }[S.view]; $('#conteudo').innerHTML = ''; f($('#conteudo')); }
-$('#bNovo').onclick = () => { if (S.view === 'objetivos') return editarObjetivo({}); if (S.view === 'tarefas') editarTarefa({}); else if (S.view === 'trabalhos') editarProjeto({}); else if (S.view === 'projetos') editarPlano({}); else if (S.view === 'lembretes') editarLembrete({}); else if (S.view === 'formularios') editarPlanilha({}); else if (S.view === 'pastas') editarPasta(S.pastaAtual ? { pai_id: S.pastaAtual, unidade: S.pastas.find((x) => x.id === S.pastaAtual)?.unidade } : {}); else novoContato(); };
+function render() { const f = { inicio: vInicio, leads: vLeads, tarefas: vTarefas, trabalhos: vTrabalhos, projetos: vProjetos, emails: vEmails, pastas: vPastas, lembretes: vLembretes, financeiro: vFinanceiro, formularios: vFormularios, conectar: vConectar, objetivos: vObjetivos }[S.view]; $('#conteudo').innerHTML = ''; f($('#conteudo')); }
+$('#bNovo').onclick = () => { if (S.view === 'objetivos') return editarObjetivo({}); if (S.view === 'financeiro') return editarFinanceiro({}); if (S.view === 'tarefas') editarTarefa({}); else if (S.view === 'trabalhos') editarProjeto({}); else if (S.view === 'projetos') editarPlano({}); else if (S.view === 'lembretes') editarLembrete({}); else if (S.view === 'formularios') editarPlanilha({}); else if (S.view === 'pastas') editarPasta(S.pastaAtual ? { pai_id: S.pastaAtual, unidade: S.pastas.find((x) => x.id === S.pastaAtual)?.unidade } : {}); else novoContato(); };
 
 // ---------- meus objetivos ----------
 const MESES_C = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -1229,6 +1231,77 @@ function editarLembrete(l0, depois) {
     try { await salvar('lembretes', novo ? d : { id: l.id, ...d }, novo ? 'Lembrete criado ⏰' : 'Lembrete salvo'); fechar(); depois ? depois() : (S.view === 'lembretes' || S.view === 'inicio') && render(); } catch {} };
 }
 
+// ---------- financeiro (assinaturas, contas e vencimentos → notificação no celular) ----------
+const FREC = { mensal: 'Todo mês', anual: 'Todo ano', trimestral: 'A cada 3 meses', semestral: 'A cada 6 meses', semanal: 'Toda semana', unica: 'Só uma vez' };
+const FCAT = { assinatura: '🔁 Assinatura', ferramenta: '🛠️ Ferramenta', conta: '🧾 Conta da casa', imposto: '🏛️ Imposto / MEI', cartao: '💳 Cartão', emprestimo: '🏦 Empréstimo', outro: '📦 Outro' };
+const FPORMES = { mensal: 1, anual: 1 / 12, trimestral: 1 / 3, semestral: 1 / 6, semanal: 52 / 12, unica: 0 };
+function diasPara(dt) { if (!dt) return 999; const a = new Date(hoje() + 'T00:00:00'), b = new Date(String(dt).slice(0, 10) + 'T00:00:00'); return Math.round((b - a) / 864e5); }
+const finValor = (v, m = 'BRL') => v == null || v === '' ? '—' : Number(v).toLocaleString(m === 'BRL' ? 'pt-BR' : m === 'EUR' ? 'pt-PT' : 'en-US', { style: 'currency', currency: m, minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function proximoVenc(dt, rec) { const [y, m, d] = String(dt).slice(0, 10).split('-').map(Number); const meses = { mensal: 1, trimestral: 3, semestral: 6, anual: 12 }[rec];
+  if (rec === 'semanal') { const x = new Date(Date.UTC(y, m - 1, d + 7)); return x.toISOString().slice(0, 10); }
+  const alvo = new Date(Date.UTC(y, m - 1 + meses, 1)); const ult = new Date(Date.UTC(alvo.getUTCFullYear(), alvo.getUTCMonth() + 1, 0)).getUTCDate(); alvo.setUTCDate(Math.min(d, ult)); return alvo.toISOString().slice(0, 10); }
+function vencTexto(f) { const n = diasPara(f.vencimento), dt = new Date(f.vencimento + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
+  return n < 0 ? `Venceu há ${-n} dia${n === -1 ? '' : 's'} · ${dt}` : n === 0 ? `Vence hoje · ${dt}` : n === 1 ? `Vence amanhã · ${dt}` : `Vence em ${n} dias · ${dt}`; }
+function vFinanceiro(el) {
+  const f = S.filtros; f.fiq = f.fiq || 'ativas';
+  const ativas = S.financeiro.filter((x) => x.ativo);
+  const porMoeda = {}; ativas.forEach((x) => { if (x.valor != null) porMoeda[x.moeda] = (porMoeda[x.moeda] || 0) + Number(x.valor) * FPORMES[x.recorrencia]; });
+  const semana = ativas.filter((x) => { const n = diasPara(x.vencimento); return n >= 0 && n <= 7; }), atras = ativas.filter((x) => diasPara(x.vencimento) < 0);
+  const somaSemana = {}; semana.forEach((x) => { if (x.valor != null) somaSemana[x.moeda] = (somaSemana[x.moeda] || 0) + Number(x.valor); });
+  const junta = (o) => Object.keys(o).length ? Object.entries(o).map(([m, v]) => finValor(v, m)).join(' + ') : finValor(0);
+  el.innerHTML = `<div id="pushBox"></div>
+    <div class="kpis">
+      <div class="cartao kpi"><small>Gasto fixo por mês</small><b style="font-size:20px">${junta(porMoeda)}</b><small>${ativas.length} conta${ativas.length === 1 ? '' : 's'} ativa${ativas.length === 1 ? '' : 's'}</small></div>
+      <div class="cartao kpi ${semana.length ? 'alerta' : ''}"><small>Vencem em 7 dias</small><b>${semana.length}</b>${semana.length ? `<small>${junta(somaSemana)}</small>` : ''}</div>
+      <div class="cartao kpi ${atras.length ? 'alerta' : ''}"><small>Atrasadas</small><b>${atras.length}</b></div>
+    </div>
+    <div class="filtros"><div class="seg">${[['ativas', 'Ativas'], ['semana', 'Próximos 7 dias'], ['encerradas', 'Encerradas']].map(([k, n]) => `<button data-fq="${k}" class="${f.fiq === k ? 'ativo' : ''}">${n}</button>`).join('')}</div><button class="btn pri peq" id="bNovoFin" style="margin-left:auto">+ Conta / assinatura</button></div>
+    <div class="cartao"><div class="lista-itens" id="fiL"></div></div>
+    <p class="muted peq" style="margin-top:10px">Cada conta avisa no celular alguns dias antes e no dia do vencimento, às 9h (ligue as notificações acima, uma vez por aparelho). Ao tocar em “Paguei”, a data pula para o próximo vencimento.</p>`;
+  caixaPush($('#pushBox'));
+  $$('[data-fq]', el).forEach((b) => (b.onclick = () => { f.fiq = b.dataset.fq; render(); }));
+  $('#bNovoFin').onclick = () => editarFinanceiro({});
+  const lista = (f.fiq === 'encerradas' ? S.financeiro.filter((x) => !x.ativo) : f.fiq === 'semana' ? ativas.filter((x) => diasPara(x.vencimento) <= 7) : ativas).slice().sort((a, b) => String(a.vencimento).localeCompare(String(b.vencimento)));
+  $('#fiL').innerHTML = lista.map((x) => { const n = diasPara(x.vencimento), alerta = x.ativo && n <= 3;
+    return `<div data-fi="${x.id}" class="fi-linha"><div style="flex:1;min-width:0"><div style="font-weight:600;${x.ativo ? '' : 'color:var(--txt-3)'}">${esc(x.nome)}</div>
+      <div class="rapidos" style="margin-top:5px">${x.ativo ? `<span class="chip ${alerta ? 'alerta' : ''}">📅 ${vencTexto(x)}</span>` : `<span class="chip">Encerrada${x.ultimo_pagamento ? ' · paga em ' + new Date(x.ultimo_pagamento + 'T12:00:00').toLocaleDateString('pt-BR') : ''}</span>`}<span class="chip">🔁 ${FREC[x.recorrencia]}</span><span class="chip">${FCAT[x.categoria] || ''}</span>${x.forma ? `<span class="chip">${esc(x.forma)}</span>` : ''}</div></div>
+      <div class="fi-acao"><b>${finValor(x.valor, x.moeda)}</b>${x.ativo ? '<button class="btn peq" data-fipago>✔ Paguei</button>' : ''}</div></div>`; }).join('') || `<p class="vazio">${f.fiq === 'encerradas' ? 'Nada encerrado.' : 'Nenhuma conta aqui. Toque em “+ Conta / assinatura” para anotar a primeira.'}</p>`;
+  $$('#fiL [data-fi]').forEach((d) => d.addEventListener('click', async (e) => { const x = S.financeiro.find((y) => y.id === d.dataset.fi); if (!x) return;
+    if (e.target.closest('[data-fipago]')) { e.target.disabled = true; await pagarFin(x); return render(); } editarFinanceiro(x); }));
+}
+async function pagarFin(x) {
+  const antes = { vencimento: x.vencimento, ativo: x.ativo, ultimo_pagamento: x.ultimo_pagamento || null };
+  const mud = x.recorrencia === 'unica' ? { ativo: false, ultimo_pagamento: hoje() } : { vencimento: proximoVenc(x.vencimento, x.recorrencia), ultimo_pagamento: hoje() };
+  try { await salvar('financeiro', { id: x.id, ...mud }); toast(mud.vencimento ? `Pago ✔ Próximo: ${new Date(mud.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}` : 'Pago ✔ Conta encerrada', '', { rot: 'Desfazer', fn: async () => { await salvar('financeiro', { id: x.id, ...antes }); render(); } }); } catch {}
+}
+function editarFinanceiro(x0) {
+  const x = { categoria: 'assinatura', recorrencia: 'mensal', moeda: 'BRL', avisar_dias: 3, ativo: true, vencimento: hoje(), ...x0 }, novo = !x.id;
+  const { v, fechar } = abrirVeu(`<div class="modal"><header><h3>${novo ? 'Nova conta / assinatura' : 'Conta / assinatura'}</h3><button class="x" aria-label="Fechar">×</button></header>
+    <form class="miolo" id="fFin"><div><label class="rot">Nome *</label><input class="campo" name="nome" required maxlength="160" value="${esc(x.nome || '')}" placeholder="Ex.: Domínio rotastudioai.com, Vercel, Internet"></div>
+    <div class="grade g3"><div><label class="rot">Valor</label><input class="campo" name="valor" inputmode="decimal" value="${x.valor != null ? String(x.valor).replace('.', ',') : ''}" placeholder="0,00"></div>
+      <div><label class="rot">Moeda</label><select class="campo" name="moeda">${opcoes({ BRL: 'R$ (Real)', USD: 'US$ (Dólar)', EUR: '€ (Euro)' }, x.moeda)}</select></div>
+      <div><label class="rot">Categoria</label><select class="campo" name="categoria">${opcoes(FCAT, x.categoria)}</select></div></div>
+    <div class="grade g3"><div><label class="rot">Próximo vencimento *</label><input class="campo" type="date" name="vencimento" required value="${esc(String(x.vencimento).slice(0, 10))}"></div>
+      <div><label class="rot">Repete</label><select class="campo" name="recorrencia">${opcoes(FREC, x.recorrencia)}</select></div>
+      <div><label class="rot">Avisar antes</label><select class="campo" name="avisar_dias">${opcoes({ 0: 'Só no dia', 1: '1 dia antes', 2: '2 dias antes', 3: '3 dias antes', 5: '5 dias antes', 7: '7 dias antes', 15: '15 dias antes', 30: '30 dias antes' }, String(x.avisar_dias))}</select></div></div>
+    <div class="grade g2"><div><label class="rot">Forma de pagamento</label><input class="campo" name="forma" maxlength="60" value="${esc(x.forma || '')}" placeholder="Ex.: Cartão Nubank, Pix, Boleto"></div>
+      <div><label class="rot">Link (onde paga / gerencia)</label><input class="campo" name="link" type="url" value="${esc(x.link || '')}" placeholder="https://"></div></div>
+    <div><label class="rot">Anotações</label><textarea class="campo" name="nota" rows="2">${esc(x.nota || '')}</textarea></div>
+    ${novo ? '' : `<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="ativo" ${x.ativo ? 'checked' : ''}> Ativa (desmarque quando cancelar a assinatura)</label>`}
+    ${x.link ? `<a class="btn peq" href="${esc(x.link)}" target="_blank" rel="noopener" style="align-self:flex-start">Abrir link ↗</a>` : ''}
+    <p class="muted peq" style="margin:0">Chega como notificação no celular ${'${dias}'} e no dia do vencimento, às 9h.</p>
+    <footer style="padding:0;border:0">${novo ? '' : '<button type="button" class="btn perigo" id="fiApagar" style="margin-right:auto">Apagar</button>'}<button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri">Salvar</button></footer></form></div>`.replace('${dias}', '<span id="fiAv"></span>'), true);
+  const av = () => { const n = +$('[name=avisar_dias]', v).value; $('#fiAv', v).textContent = n ? `${n} dia${n === 1 ? '' : 's'} antes` : ''; };
+  $('[name=avisar_dias]', v).onchange = av; av();
+  if (novo) $('[name=nome]', v).focus();
+  $('#fiApagar', v)?.addEventListener('click', async () => { if (!confirm('Apagar esta conta? Os avisos dela também somem.')) return; try { await A.apagar('financeiro', x.id); S.financeiro = S.financeiro.filter((y) => y.id !== x.id); S.lembretes = S.lembretes.filter((l) => l.financeiro_id !== x.id); contadores(); fechar(); render(); toast('Conta apagada'); } catch (e) { falha(e); } });
+  $('#fFin', v).onsubmit = async (e) => { e.preventDefault(); const fd = new FormData(e.target), d = {};
+    ['nome', 'moeda', 'categoria', 'vencimento', 'recorrencia', 'forma', 'link', 'nota'].forEach((k) => (d[k] = (fd.get(k) || '').trim() || null));
+    const val = (fd.get('valor') || '').trim(); d.valor = val ? Number(val.includes(',') ? val.replace(/\./g, '').replace(',', '.') : val) : null; if (val && !isFinite(d.valor)) return toast('Valor inválido', 'erro');
+    d.avisar_dias = +fd.get('avisar_dias'); d.ativo = novo ? true : !!fd.get('ativo');
+    try { await salvar('financeiro', novo ? d : { id: x.id, ...d }, novo ? 'Conta anotada 💳' : 'Conta salva'); fechar(); render(); if (!A.modoDemo) setTimeout(recarregar, 600); } catch {} };
+}
+
 // ---------- formulários (tabelas tipo planilha; senhas criptografadas) ----------
 const CTIPOS = { texto: 'Texto', email: 'E-mail', senha: 'Senha 🔒', link: 'Link', numero: 'Número', data: 'Data', nota: 'Observação' };
 const chavesCofre = new Map(); // planilha_id -> CryptoKey (só na memória desta aba; some ao recarregar)
@@ -1270,12 +1343,13 @@ function editarPlanilha(p0) {
 }
 async function abrirPlanilha(el, p) {
   const cols = p.colunas || [], temSenha = cols.some((c) => c.tipo === 'senha'), chave = chavesCofre.get(p.id);
-  el.innerHTML = `<div class="filtros"><div class="trilha"><button class="btn peq fant" id="phVolta">📋 Formulários</button><span class="muted">/</span><b>${esc(p.nome)}</b></div><input class="campo" id="phQ" placeholder="Filtrar…" style="min-width:160px"><span style="margin-left:auto"></span>${temSenha ? (chave ? '<button class="btn peq" id="phTranca">🔓 Trancar senhas</button>' : '<button class="btn peq pri" id="phAbre">🔐 Abrir cofre</button>') : ''}<button class="btn peq" id="phCsv">Exportar CSV</button><button class="btn peq" id="phEd">Editar colunas</button><button class="btn pri peq" id="phNova">+ Linha</button></div>
+  el.innerHTML = `<div class="filtros"><div class="trilha"><button class="btn peq fant" id="phVolta">📋 Formulários</button><span class="muted">/</span><b>${esc(p.nome)}</b></div><input class="campo" id="phQ" placeholder="Filtrar…" style="min-width:160px"><span style="margin-left:auto"></span>${temSenha && p.cofre ? '<button class="btn peq" id="phTroca">🔑 Trocar senha-mestra</button>' : ''}${temSenha ? (chave ? '<button class="btn peq" id="phTranca">🔓 Trancar senhas</button>' : '<button class="btn peq pri" id="phAbre">🔐 Abrir cofre</button>') : ''}<button class="btn peq" id="phCsv">Exportar CSV</button><button class="btn peq" id="phEd">Editar colunas</button><button class="btn pri peq" id="phNova">+ Linha</button></div>
     ${p.descricao ? `<p class="muted peq" style="margin:-4px 0 10px">${esc(p.descricao)}</p>` : ''}<div class="cartao rolagem"><table class="tab grade-ph"><thead><tr>${cols.map((c) => `<th>${esc(c.nome)}${c.tipo === 'senha' ? ' 🔒' : ''}</th>`).join('')}<th style="width:40px"></th></tr></thead><tbody id="phB"><tr><td colspan="${cols.length + 1}"><div class="giro" style="margin:14px auto"></div></td></tr></tbody></table></div>
     <p class="muted peq" style="margin-top:8px">Toque numa célula para editar · salva sozinho${temSenha ? ' · senhas só aparecem com o cofre aberto (a senha-mestra não fica salva)' : ''}.</p>`;
   $('#phVolta').onclick = () => { S.planilhaAtual = null; render(); };
   $('#phEd').onclick = () => editarPlanilha(p);
   $('#phAbre')?.addEventListener('click', () => abrirCofre(p));
+  $('#phTroca')?.addEventListener('click', () => trocarMestra(p));
   $('#phTranca')?.addEventListener('click', () => { chavesCofre.delete(p.id); render(); });
   let linhas = [];
   try { linhas = await A.linhasPlanilha(p.id); } catch (e) { return falha(e); }
@@ -1283,7 +1357,7 @@ async function abrirPlanilha(el, p) {
   const claro = new Map(); // linha_id+col -> senha decifrada (só na tela)
   if (chave) for (const l of linhas) for (const c of cols) if (c.tipo === 'senha' && l.valores?.[c.id]?.ct) { try { claro.set(l.id + c.id, await A.cofre.decifrar(chave, l.valores[c.id])); } catch { claro.set(l.id + c.id, '⚠ não abriu'); } }
   const celula = (l, c) => { const val = l.valores?.[c.id];
-    if (c.tipo === 'senha') { if (!val) return '<span class="muted">—</span>'; return chave ? `<span class="senha-cel"><code>••••••••</code><button class="btn peq fant" data-ver title="Mostrar">👁</button><button class="btn peq fant" data-cop title="Copiar">⧉</button></span>` : '<span class="muted">🔒 ••••••</span>'; }
+    if (c.tipo === 'senha') { if (!val) return '<span class="muted">—</span>'; return chave ? `<span class="senha-cel"><span class="sv">••••••••</span><button class="btn peq fant" data-ver title="Mostrar">👁</button><button class="btn peq fant" data-cop title="Copiar">⧉</button></span>` : '<span class="muted">🔒 ••••••</span>'; }
     if (!val) return '<span class="muted">—</span>';
     if (c.tipo === 'link') { const u = urlSegura(val); return u ? `<a href="${esc(u)}" target="_blank" rel="noopener" data-link>${esc(val.replace(/^https?:\/\//, '').slice(0, 40))}</a>` : esc(val); }
     if (c.tipo === 'email') return `${esc(val)} <button class="btn peq fant" data-cop title="Copiar">⧉</button>`;
@@ -1309,7 +1383,7 @@ async function abrirPlanilha(el, p) {
     const tr = e.target.closest('tr[data-ln]'); if (!tr) return; const l = linhas.find((x) => x.id === tr.dataset.ln); const td = e.target.closest('td[data-c]'); const c = td && cols.find((x) => x.id === td.dataset.c);
     if (e.target.closest('[data-apaga]')) { if (!confirm('Apagar esta linha?')) return; try { await A.apagar('planilha_linhas', l.id); linhas = linhas.filter((x) => x.id !== l.id); desenhar(); } catch (er) { falha(er); } return; }
     if (e.target.closest('[data-link]')) return;
-    if (e.target.closest('[data-ver]')) { const sp = td.querySelector('code'); sp.textContent = sp.textContent.startsWith('•') ? claro.get(l.id + c.id) || '' : '••••••••'; return; }
+    if (e.target.closest('[data-ver]')) { const sp = td.querySelector('.sv'); sp.textContent = sp.textContent.startsWith('•') ? claro.get(l.id + c.id) || '' : '••••••••'; return; }
     if (e.target.closest('[data-cop]')) return copiar(c.tipo === 'senha' ? claro.get(l.id + c.id) || '' : l.valores?.[c.id] || '');
     if (c && !td.querySelector('input,textarea')) editarCelula(l, c, td);
   });
@@ -1317,6 +1391,35 @@ async function abrirPlanilha(el, p) {
   $('#phCsv').onclick = () => { if (temSenha && !confirm('O CSV sai SEM as senhas (por segurança). Continuar?')) return; const cel = (v) => { let s = String(v ?? ''); if (/^[=+\-@]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
     const cs = cols.filter((c) => c.tipo !== 'senha'); const csv = '﻿' + cs.map((c) => cel(c.nome)).join(';') + '\n' + linhas.map((l) => cs.map((c) => cel(l.valores?.[c.id])).join(';')).join('\n');
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = p.nome.replace(/[^\w-]+/g, '-') + '.csv'; a.click(); };
+}
+function trocarMestra(p) {
+  const { v, fechar } = abrirVeu(`<div class="modal" style="width:min(440px,100%)"><header><h3>🔑 Trocar senha-mestra</h3><button class="x" aria-label="Fechar">×</button></header><form class="miolo" id="fTm">
+    <div><label class="rot">Senha-mestra atual</label><input class="campo" type="password" id="tmA" required autocomplete="current-password"></div>
+    <div><label class="rot">Nova senha-mestra (mínimo 8 caracteres)</label><input class="campo" type="password" id="tmN1" required minlength="8" autocomplete="new-password"></div>
+    <div><label class="rot">Repita a nova</label><input class="campo" type="password" id="tmN2" required autocomplete="new-password"></div>
+    <p class="muted peq" style="margin:0">Todas as senhas de "${esc(p.nome)}" são criptografadas de novo com a nova senha-mestra. Ela não fica salva em lugar nenhum: se esquecer, não dá para recuperar.</p>
+    <footer style="padding:0;border:0"><button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri" id="tmB">Trocar</button></footer></form></div>`, true);
+  $('#tmA', v).focus();
+  $('#fTm', v).onsubmit = async (e) => {
+    e.preventDefault(); const n1 = $('#tmN1', v).value, n2 = $('#tmN2', v).value;
+    if (n1.length < 8) return toast('Nova senha-mestra com pelo menos 8 caracteres.', 'erro');
+    if (n1 !== n2) return toast('As novas senhas não conferem.', 'erro');
+    const b = $('#tmB', v); b.disabled = true; b.textContent = 'Trocando…';
+    try {
+      const velha = await A.cofre.abrir(p.cofre, $('#tmA', v).value);
+      const cols = (p.colunas || []).filter((c) => c.tipo === 'senha');
+      const linhas = await A.linhasPlanilha(p.id);
+      const nova = await A.cofre.criar(n1);
+      // decifra tudo antes de gravar qualquer coisa: se algo falhar, nada muda
+      const prontas = [];
+      for (const l of linhas) { let mudou = false; const valores = { ...(l.valores || {}) };
+        for (const c of cols) { const val = valores[c.id]; if (val && val.ct) { valores[c.id] = await A.cofre.cifrar(nova.k, await A.cofre.decifrar(velha, val)); mudou = true; } }
+        if (mudou) prontas.push({ id: l.id, valores }); }
+      for (const r of prontas) await A.salvar('planilha_linhas', r);
+      const r = await salvar('planilhas', { id: p.id, cofre: nova.info }, 'Senha-mestra trocada');
+      chavesCofre.set(p.id, nova.k); fechar(); render();
+    } catch (er) { falha(er); b.disabled = false; b.textContent = 'Trocar'; }
+  };
 }
 function abrirCofre(p) {
   const { v, fechar } = abrirVeu(`<div class="modal" style="width:min(420px,100%)"><header><h3>🔐 Abrir cofre</h3><button class="x" aria-label="Fechar">×</button></header><form class="miolo" id="fCf"><label class="rot">Senha-mestra de "${esc(p.nome)}"</label><input class="campo" type="password" id="cfS" required autocomplete="current-password"><p class="muted peq" style="margin:0">Fica aberto só nesta aba até você trancar ou recarregar a página.</p><footer style="padding:0;border:0"><button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri" id="cfB">Abrir</button></footer></form></div>`, true);
@@ -1405,6 +1508,7 @@ function abrirBusca() {
       S.contatos.forEach((c) => { if ([c.nome, c.empresa, c.email, c.telefone, c.instagram, c.nicho, c.cidade].some((x) => String(x || '').toLowerCase().includes(q))) res.push({ ic: '👤', t: c.nome, s: [c.empresa, ETAPA[c.etapa]?.n].filter(Boolean).join(' · '), go: () => abrirContato(c.id) }); });
       S.tarefas.forEach((t) => { if (t.titulo.toLowerCase().includes(q)) res.push({ ic: t.status === 'feita' ? '☑' : '☐', t: t.titulo, s: 'Tarefa · ' + (pessoa(t.responsavel)?.nome || ''), go: () => editarTarefa(t) }); });
       S.planos.forEach((p) => { if ((p.nome + ' ' + (p.ideias || '')).toLowerCase().includes(q)) res.push({ ic: '⭐', t: p.nome, s: 'Projeto · ' + (PLN[p.status]?.n || ''), go: () => editarPlano(p) }); });
+      (S.financeiro || []).forEach((f) => { if (f.nome.toLowerCase().includes(q)) res.push({ ic: '💳', t: f.nome, s: 'Financeiro · ' + (f.ativo ? vencTexto(f) : 'encerrada'), go: () => editarFinanceiro(f) }); });
       S.lembretes.forEach((l) => { if (l.titulo.toLowerCase().includes(q)) res.push({ ic: '⏰', t: l.titulo, s: 'Lembrete · ' + quandoTexto(l.quando), go: () => editarLembrete(l) }); });
       S.planilhas.forEach((p) => { if (p.nome.toLowerCase().includes(q)) res.push({ ic: '📋', t: p.nome, s: 'Formulário', go: () => { S.planilhaAtual = p.id; irPara('formularios'); } }); });
       S.pastas.forEach((p) => { if (p.nome.toLowerCase().includes(q)) res.push({ ic: '📁', t: p.nome, s: 'Pasta', go: () => { S.pastaAtual = p.id; irPara('pastas'); } }); });
