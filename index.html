@@ -271,6 +271,22 @@ body:has(.visor) #toasts{bottom:auto;top:16px}
 .senha-cel{display:inline-flex;align-items:center;gap:2px}
 .senha-cel .sv{font:inherit;color:inherit;letter-spacing:normal}
 .codigo{font:12px/1.5 ui-monospace,Menlo,monospace;background:var(--card-2);border:1px solid var(--linha);border-radius:9px;padding:10px;white-space:pre-wrap;word-break:break-all}
+
+/* ideias e faturamento */
+.modo-tar{margin-bottom:14px}.seg.grande button{padding:9px 16px;font-size:14px;font-weight:600}.seg .cont{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#7c3aed;color:#fff;font-size:11px;margin-left:4px}
+.ideia{padding:12px 13px;border-bottom:1px solid var(--linha)}.ideia:last-child{border-bottom:0}
+.ideia .tt{font-weight:600;cursor:pointer;word-break:break-word}.ideia .desc{color:var(--txt-2);font-size:13px;margin-top:3px;cursor:pointer;white-space:pre-line}
+.ideia .meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;align-items:center}.ideia .acoes{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.chip.quente{background:#fff1e6;border-color:#fdba74;color:#c2410c}.chip.stripe{background:#efeafe;border-color:#c4b5fd;color:#6d28d9}
+.ilista{padding:0}
+.kpi.destaque{background:linear-gradient(135deg,color-mix(in srgb,var(--verde) 14%,var(--card)),var(--card))}.kpi .sobe{color:#16a34a;font-weight:600}.kpi .desce{color:#d9534f;font-weight:600}
+.grade-fat{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px}@media (max-width:900px){.grade-fat{grid-template-columns:minmax(0,1fr)}}
+.grade-fat>.cartao{padding:0}.grafico-sc{overflow-x:auto;padding:4px 14px 12px}.grafico svg{width:100%;min-width:520px;height:auto;display:block;margin-top:8px}
+.grafico rect{fill:color-mix(in srgb,var(--verde) 38%,var(--card-2))}.grafico .atual rect{fill:var(--verde)}
+.grafico .vl{font-size:11px;font-weight:600;fill:var(--txt-2);text-anchor:middle}.grafico .mx{font-size:11px;fill:var(--txt-3,#8a919c);text-anchor:middle}.grafico .atual .mx{fill:var(--txt);font-weight:700}
+.svs{display:flex;flex-direction:column;gap:12px;padding:14px 16px 16px}.sv-t{display:flex;justify-content:space-between;gap:10px;font-size:13.5px}.sv-t span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sv-b{height:8px;border-radius:5px;background:var(--card-2);margin-top:5px;overflow:hidden}.sv-b i{display:block;height:100%;border-radius:5px;background:var(--verde)}
+.positivo{color:#16a34a}
 </style>
 <script src="config.js"></script>
 <script src="crm-api.js"></script>
@@ -349,7 +365,7 @@ body:has(.visor) #toasts{bottom:auto;top:16px}
 const A = window.CRM;
 const $ = (s, el = document) => el.querySelector(s), $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const S = { eu: null, equipe: [], unidades: [], contatos: [], tarefas: [], projetos: [], emails: [], pastas: [], arquivos: [], modelos: [], planos: [], lembretes: [], planilhas: [], objetivos: [], financeiro: [], planilhaAtual: null, pastaAtual: null, view: 'inicio', unidade: A.local.get('crm-unidade') || 'todas', filtros: {} };
+const S = { eu: null, equipe: [], unidades: [], contatos: [], tarefas: [], projetos: [], emails: [], pastas: [], arquivos: [], modelos: [], planos: [], lembretes: [], planilhas: [], objetivos: [], financeiro: [], ideias: [], faturamento: [], planilhaAtual: null, pastaAtual: null, view: 'inicio', unidade: A.local.get('crm-unidade') || 'todas', filtros: {} };
 const ETAPAS = [['novo', 'Novo', '#64748b'], ['em_contato', 'Em contato', '#0ea5e9'], ['proposta', 'Proposta enviada', '#a855f7'], ['negociacao', 'Negociação', '#f59e0b'], ['fechado', 'Fechado', '#16a34a'], ['perdido', 'Perdido', '#9ca3af']];
 const ETAPA = Object.fromEntries(ETAPAS.map(([k, n, c]) => [k, { n, c }]));
 const ORIGENS = { formulario: 'Formulário', email: 'E-mail', manual: 'Manual', instagram: 'Instagram', whatsapp: 'WhatsApp', indicacao: 'Indicação', anuncio: 'Anúncio', outro: 'Outro' };
@@ -454,7 +470,7 @@ $$('.nav').forEach((n) => (n.onclick = () => irPara(n.dataset.v)));
 $('#bMenu').onclick = () => $('#lado').classList.toggle('aberto');
 window.addEventListener('hashchange', () => { const v = hashAtual(); if (v && v !== S.view && !$('#app').hidden) irPara(v); });
 function render() { const f = { inicio: vInicio, leads: vLeads, tarefas: vTarefas, trabalhos: vTrabalhos, projetos: vProjetos, emails: vEmails, pastas: vPastas, lembretes: vLembretes, financeiro: vFinanceiro, formularios: vFormularios, conectar: vConectar, objetivos: vObjetivos }[S.view]; $('#conteudo').innerHTML = ''; f($('#conteudo')); }
-$('#bNovo').onclick = () => { if (S.view === 'objetivos') return editarObjetivo({}); if (S.view === 'financeiro') return editarFinanceiro({}); if (S.view === 'tarefas') editarTarefa({}); else if (S.view === 'trabalhos') editarProjeto({}); else if (S.view === 'projetos') editarPlano({}); else if (S.view === 'lembretes') editarLembrete({}); else if (S.view === 'formularios') editarPlanilha({}); else if (S.view === 'pastas') editarPasta(S.pastaAtual ? { pai_id: S.pastaAtual, unidade: S.pastas.find((x) => x.id === S.pastaAtual)?.unidade } : {}); else novoContato(); };
+$('#bNovo').onclick = () => { if (S.view === 'objetivos') return editarObjetivo({}); if (S.view === 'financeiro') return S.filtros.fimodo === 'contas' ? editarFinanceiro({}) : editarFaturamento({}); if (S.view === 'tarefas') return S.filtros.tmodo === 'ideias' ? editarIdeia({}) : editarTarefa({}); else if (S.view === 'trabalhos') editarProjeto({}); else if (S.view === 'projetos') editarPlano({}); else if (S.view === 'lembretes') editarLembrete({}); else if (S.view === 'formularios') editarPlanilha({}); else if (S.view === 'pastas') editarPasta(S.pastaAtual ? { pai_id: S.pastaAtual, unidade: S.pastas.find((x) => x.id === S.pastaAtual)?.unidade } : {}); else novoContato(); };
 
 // ---------- meus objetivos ----------
 const MESES_C = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -787,9 +803,10 @@ function ligarTarefas(raiz, depois) {
   }));
 }
 function vTarefas(el) {
-  const f = S.filtros; f.tstatus = f.tstatus || 'abertas';
+  const f = S.filtros; if (f.tmodo === 'ideias') return vIdeias(el); f.tstatus = f.tstatus || 'abertas';
   el.innerHTML = `<div class="filtros"><div class="seg">${[['abertas', 'Abertas'], ['hoje', 'Hoje e atrasadas'], ['feitas', 'Feitas'], ['todas', 'Todas']].map(([k, n]) => `<button data-s="${k}" class="${f.tstatus === k ? 'ativo' : ''}">${n}</button>`).join('')}</div><input class="campo" id="ftq" placeholder="Filtrar tarefas…" value="${esc(f.tq || '')}"></div><div class="tquadro" id="tq"></div>`;
-  $$('.seg button', el).forEach((b) => (b.onclick = () => { f.tstatus = b.dataset.s; render(); }));
+  modoTarefas(el);
+  $$('.filtros .seg button', el).forEach((b) => (b.onclick = () => { f.tstatus = b.dataset.s; render(); }));
   $('#ftq').oninput = (e) => { f.tq = e.target.value; desenhar(); };
   const colunas = SOLO()
     ? [{ apelido: 'agora', nome: 'Hoje e atrasadas', cor: 'agora' }, { apelido: 'semana', nome: 'Próximos 7 dias', cor: 'semana' }, { apelido: 'depois', nome: 'Depois e sem prazo', cor: 'depois' }]
@@ -1243,7 +1260,7 @@ function proximoVenc(dt, rec) { const [y, m, d] = String(dt).slice(0, 10).split(
 function vencTexto(f) { const n = diasPara(f.vencimento), dt = new Date(f.vencimento + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
   return n < 0 ? `Venceu há ${-n} dia${n === -1 ? '' : 's'} · ${dt}` : n === 0 ? `Vence hoje · ${dt}` : n === 1 ? `Vence amanhã · ${dt}` : `Vence em ${n} dias · ${dt}`; }
 function vFinanceiro(el) {
-  const f = S.filtros; f.fiq = f.fiq || 'ativas';
+  const f = S.filtros; if (f.fimodo !== 'contas') return vFaturamento(el); f.fiq = f.fiq || 'ativas';
   const ativas = S.financeiro.filter((x) => x.ativo);
   const porMoeda = {}; ativas.forEach((x) => { if (x.valor != null) porMoeda[x.moeda] = (porMoeda[x.moeda] || 0) + Number(x.valor) * FPORMES[x.recorrencia]; });
   const semana = ativas.filter((x) => { const n = diasPara(x.vencimento); return n >= 0 && n <= 7; }), atras = ativas.filter((x) => diasPara(x.vencimento) < 0);
@@ -1258,6 +1275,7 @@ function vFinanceiro(el) {
     <div class="filtros"><div class="seg">${[['ativas', 'Ativas'], ['semana', 'Próximos 7 dias'], ['encerradas', 'Encerradas']].map(([k, n]) => `<button data-fq="${k}" class="${f.fiq === k ? 'ativo' : ''}">${n}</button>`).join('')}</div><button class="btn pri peq" id="bNovoFin" style="margin-left:auto">+ Conta / assinatura</button></div>
     <div class="cartao"><div class="lista-itens" id="fiL"></div></div>
     <p class="muted peq" style="margin-top:10px">Cada conta avisa no celular alguns dias antes e no dia do vencimento, às 9h (ligue as notificações acima, uma vez por aparelho). Ao tocar em “Paguei”, a data pula para o próximo vencimento.</p>`;
+  modoFinanceiro(el);
   caixaPush($('#pushBox'));
   $$('[data-fq]', el).forEach((b) => (b.onclick = () => { f.fiq = b.dataset.fq; render(); }));
   $('#bNovoFin').onclick = () => editarFinanceiro({});
@@ -1300,6 +1318,174 @@ function editarFinanceiro(x0) {
     const val = (fd.get('valor') || '').trim(); d.valor = val ? Number(val.includes(',') ? val.replace(/\./g, '').replace(',', '.') : val) : null; if (val && !isFinite(d.valor)) return toast('Valor inválido', 'erro');
     d.avisar_dias = +fd.get('avisar_dias'); d.ativo = novo ? true : !!fd.get('ativo');
     try { await salvar('financeiro', novo ? d : { id: x.id, ...d }, novo ? 'Conta anotada 💳' : 'Conta salva'); fechar(); render(); if (!A.modoDemo) setTimeout(recarregar, 600); } catch {} };
+}
+
+
+// ---------- ideias (ficam junto das tarefas) ----------
+const ISTATUS = { nova: ['💡', 'Novas', '#7c3aed'], analisando: ['🔍', 'Analisando', '#d97706'], aprovada: ['✔', 'Aprovadas', '#16a34a'], feita: ['🏁', 'Feita', '#64748b'], descartada: ['✕', 'Descartada', '#9ca3af'] };
+const IPOT = { baixo: 'Baixo', normal: 'Normal', alto: 'Alto' };
+function modoTarefas(el) {
+  const f = S.filtros, n = (S.ideias || []).filter((i) => ['nova', 'analisando', 'aprovada'].includes(i.status)).length;
+  const box = document.createElement('div'); box.className = 'modo-tar';
+  box.innerHTML = `<div class="seg grande"><button data-tm="tarefas" class="${f.tmodo !== 'ideias' ? 'ativo' : ''}">✅ Tarefas</button><button data-tm="ideias" class="${f.tmodo === 'ideias' ? 'ativo' : ''}">💡 Ideias${n ? ` <span class="cont">${n}</span>` : ''}</button></div>`;
+  el.prepend(box);
+  $$('[data-tm]', box).forEach((b) => (b.onclick = () => { f.tmodo = b.dataset.tm; render(); }));
+}
+function linhaIdeia(i) {
+  const prox = { nova: ['analisando', '🔍 Analisar'], analisando: ['aprovada', '✔ Aprovar'] }[i.status];
+  const t = i.tarefa_id && S.tarefas.find((x) => x.id === i.tarefa_id);
+  return `<div class="ideia" data-id="${i.id}"><div class="tt" data-acao="abrir">${esc(i.titulo)}</div>
+    ${i.descricao ? `<div class="desc" data-acao="abrir">${esc(i.descricao.length > 140 ? i.descricao.slice(0, 140) + '…' : i.descricao)}</div>` : ''}
+    <div class="meta">${i.potencial === 'alto' ? '<span class="chip quente">🔥 Alto potencial</span>' : i.potencial === 'baixo' ? '<span class="chip">Baixo potencial</span>' : ''}${i.categoria ? `<span class="chip">${esc(i.categoria)}</span>` : ''}${t ? `<span class="chip verde" data-acao="tarefa" style="cursor:pointer">✅ Virou tarefa${t.status === 'feita' ? ' · feita' : ''}</span>` : ''}${i.unidade && S.unidade === 'todas' ? `<span class="ponto" title="${esc(unidade(i.unidade).nome)}" style="background:${esc(unidade(i.unidade).cor)}"></span>` : ''}${i.link ? `<a class="chip" href="${esc(i.link)}" target="_blank" rel="noopener">🔗 Link</a>` : ''}</div>
+    ${['feita', 'descartada'].includes(i.status) ? `<div class="acoes"><button class="btn peq fant" data-acao="reabrir">↺ Reabrir</button></div>` : `<div class="acoes">${prox ? `<button class="btn peq fant" data-acao="st" data-st="${prox[0]}">${prox[1]}</button>` : ''}${i.status === 'aprovada' && !t ? '<button class="btn peq fant" data-acao="virar">➜ Virar tarefa</button>' : ''}${i.status === 'aprovada' ? '<button class="btn peq fant" data-acao="st" data-st="feita">🏁 Feita</button>' : ''}<button class="btn peq fant" data-acao="st" data-st="descartada">✕ Descartar</button></div>`}
+  </div>`;
+}
+async function virarTarefa(i) {
+  const t = await salvar('tarefas', { titulo: i.titulo.slice(0, 200), descricao: [i.descricao, i.link].filter(Boolean).join('\n\n') || null, responsavel: SOLO() ? S.eu : 'ambos', unidade: i.unidade || null, ordem: Date.now() }, 'Ideia virou tarefa ✅');
+  await salvar('ideias', { id: i.id, tarefa_id: t.id, status: 'aprovada' });
+}
+function vIdeias(el) {
+  const f = S.filtros; f.istatus = f.istatus || 'ativas';
+  el.innerHTML = `<div class="filtros"><div class="seg">${[['ativas', 'Em aberto'], ['feita', 'Feitas'], ['descartada', 'Descartadas']].map(([k, n]) => `<button data-is="${k}" class="${f.istatus === k ? 'ativo' : ''}">${n}</button>`).join('')}</div><input class="campo" id="fiq2" placeholder="Filtrar ideias…" value="${esc(f.iq || '')}"><button class="btn pri peq" id="bNovaIdeia" style="margin-left:auto">+ Ideia</button></div><div id="iq"></div>`;
+  modoTarefas(el);
+  $$('[data-is]', el).forEach((b) => (b.onclick = () => { f.istatus = b.dataset.is; render(); }));
+  $('#fiq2').oninput = (e) => { f.iq = e.target.value; desenhar(); };
+  $('#bNovaIdeia').onclick = () => editarIdeia({});
+  function desenhar() {
+    const q = (f.iq || '').toLowerCase();
+    const base = (S.ideias || []).filter((i) => (S.unidade === 'todas' || !i.unidade || i.unidade === S.unidade) && (!q || [i.titulo, i.descricao, i.categoria].join(' ').toLowerCase().includes(q)));
+    const ord = (a, b) => (b.potencial === 'alto') - (a.potencial === 'alto') || (b.ordem || 0) - (a.ordem || 0);
+    if (f.istatus !== 'ativas') {
+      const it = base.filter((i) => i.status === f.istatus).sort((a, b) => String(b.atualizado_em).localeCompare(String(a.atualizado_em)));
+      $('#iq').innerHTML = `<div class="cartao ilista">${it.map(linhaIdeia).join('') || '<p class="vazio">Nada aqui.</p>'}</div>`;
+    } else {
+      $('#iq').innerHTML = `<div class="tquadro">${['nova', 'analisando', 'aprovada'].map((st) => { const it = base.filter((i) => i.status === st).sort(ord); const [ic, nome, cor] = ISTATUS[st];
+        return `<section class="tcol" style="--cor:${cor}"><header><span style="font-size:16px">${ic}</span><h3>${nome}</h3><small>${it.length}</small></header>
+        ${st === 'nova' ? `<form class="nova"><input class="campo" placeholder="Anotar uma ideia…" maxlength="200"><button class="btn peq pri">+</button></form>` : ''}
+        <div>${it.map(linhaIdeia).join('') || `<p class="vazio">${st === 'nova' ? 'Anote qualquer ideia aqui, mesmo pela metade.' : 'Nada aqui.'}</p>`}</div></section>`; }).join('')}</div>`;
+      const fm = $('#iq form.nova'); if (fm) fm.onsubmit = async (e) => { e.preventDefault(); const inp = $('input', fm), titulo = inp.value.trim(); if (!titulo) return; inp.disabled = true;
+        try { await salvar('ideias', { titulo, status: 'nova', potencial: 'normal', unidade: S.unidade !== 'todas' ? S.unidade : null, ordem: Date.now() }, 'Ideia anotada 💡'); desenhar(); setTimeout(() => $('#iq form.nova input')?.focus(), 0); } catch { inp.disabled = false; } };
+    }
+    $$('#iq .ideia').forEach((d) => d.addEventListener('click', async (e) => {
+      const alvo = e.target.closest('[data-acao]'); if (!alvo || alvo.tagName === 'A') return; const i = S.ideias.find((x) => x.id === d.dataset.id); if (!i) return; const a = alvo.dataset.acao;
+      if (a === 'abrir') return editarIdeia(i);
+      if (a === 'tarefa') return editarTarefa(S.tarefas.find((x) => x.id === i.tarefa_id));
+      try {
+        if (a === 'st') await salvar('ideias', { id: i.id, status: alvo.dataset.st }, { analisando: 'Ideia em análise 🔍', aprovada: 'Ideia aprovada ✔', feita: 'Ideia feita 🏁', descartada: 'Ideia descartada' }[alvo.dataset.st]);
+        if (a === 'reabrir') await salvar('ideias', { id: i.id, status: 'nova' }, 'Ideia reaberta');
+        if (a === 'virar') await virarTarefa(i);
+      } catch {}
+      desenhar();
+    }));
+  }
+  desenhar();
+}
+function editarIdeia(i0) {
+  const i = { status: 'nova', potencial: 'normal', unidade: S.unidade !== 'todas' ? S.unidade : null, ...i0 }, novo = !i.id;
+  const cats = [...new Set(['Produto', 'Serviço', 'Conteúdo', 'Marketing', 'Oferta', 'Sistema', 'Processo', ...(S.ideias || []).map((x) => x.categoria).filter(Boolean)])];
+  const { v, fechar } = abrirVeu(`<div class="modal"><header><h3>${novo ? 'Nova ideia' : 'Ideia'}</h3><button class="x" aria-label="Fechar">×</button></header>
+    <form class="miolo" id="fI">
+      <div><label class="rot">Ideia *</label><input class="campo" name="titulo" required maxlength="200" value="${esc(i.titulo || '')}" placeholder="Ex.: Pacote de site + social media para restaurantes"></div>
+      <div><label class="rot">Detalhes</label><textarea class="campo" name="descricao" maxlength="4000" rows="4" placeholder="Como funcionaria, para quem, o que precisa…">${esc(i.descricao || '')}</textarea></div>
+      <div class="grade g3">
+        <div><label class="rot">Situação</label><select class="campo" name="status">${opcoes(Object.fromEntries(Object.entries(ISTATUS).map(([k, [, n]]) => [k, k === 'nova' ? 'Nova' : n])), i.status)}</select></div>
+        <div><label class="rot">Potencial</label><select class="campo" name="potencial">${opcoes(IPOT, i.potencial)}</select></div>
+        <div><label class="rot">Categoria</label><input class="campo" name="categoria" list="iCats" maxlength="60" value="${esc(i.categoria || '')}"><datalist id="iCats">${cats.map((c) => `<option value="${esc(c)}">`).join('')}</datalist></div>
+      </div>
+      <div class="grade g2"><div><label class="rot">Unidade</label><select class="campo" name="unidade"><option value="">—</option>${opUnid(i.unidade)}</select></div>
+        <div><label class="rot">Link (referência)</label><input class="campo" type="url" name="link" value="${esc(i.link || '')}" placeholder="https://"></div></div>
+      <footer style="padding:0;border:0">${novo ? '' : '<button type="button" class="btn perigo" id="iApagar" style="margin-right:auto">Apagar</button>'}${!novo && !i.tarefa_id ? '<button type="button" class="btn" id="iVirar">➜ Virar tarefa</button>' : ''}<button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri">Salvar</button></footer>
+    </form></div>`, true);
+  if (novo) $('[name=titulo]', v).focus();
+  $('#iApagar', v)?.addEventListener('click', async () => { if (!confirm('Apagar esta ideia?')) return; try { await A.apagar('ideias', i.id); S.ideias = S.ideias.filter((x) => x.id !== i.id); fechar(); render(); toast('Ideia apagada'); } catch (e) { falha(e); } });
+  $('#iVirar', v)?.addEventListener('click', async () => { try { await virarTarefa(i); fechar(); render(); } catch {} });
+  $('#fI', v).onsubmit = async (e) => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); Object.keys(d).forEach((k) => (d[k] = d[k].trim() || null));
+    if (d.unidade === '__nova__') d.unidade = null;
+    try { await salvar('ideias', novo ? { ...d, ordem: Date.now() } : { id: i.id, ...d }, novo ? 'Ideia anotada 💡' : 'Ideia salva'); fechar(); render(); } catch {} };
+}
+
+// ---------- faturamento (dashboard no Financeiro) ----------
+const SERVICOS_FAT = ['Site', 'Sistema', 'Cardápio digital', 'Social media · Essencial', 'Social media · Pro', 'Social media · Premium', 'Agente de IA', 'Automação', 'Anúncios', 'Vídeo', 'Outro'];
+const FORMAS_FAT = ['Pix', 'Stripe', 'Cartão', 'Transferência', 'Dinheiro', 'Boleto'];
+const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+function modoFinanceiro(el) {
+  const f = S.filtros, box = document.createElement('div'); box.className = 'modo-tar';
+  box.innerHTML = `<div class="seg grande"><button data-fm="faturamento" class="${f.fimodo !== 'contas' ? 'ativo' : ''}">📈 Faturamento</button><button data-fm="contas" class="${f.fimodo === 'contas' ? 'ativo' : ''}">💳 Contas a pagar</button></div>`;
+  el.prepend(box); $$('[data-fm]', box).forEach((b) => (b.onclick = () => { f.fimodo = b.dataset.fm; render(); }));
+}
+function mesChave(dt) { return String(dt).slice(0, 7); }
+function vFaturamento(el) {
+  const f = S.filtros; f.fper = f.fper || 'mes';
+  const fat = (S.faturamento || []).filter((x) => S.unidade === 'todas' || !x.unidade || x.unidade === S.unidade);
+  const h = hoje(), mesAtual = h.slice(0, 7), ano = h.slice(0, 4);
+  const mesDesloc = (n) => { const [y, m] = mesAtual.split('-').map(Number); const x = new Date(Date.UTC(y, m - 1 + n, 1)); return x.toISOString().slice(0, 7); };
+  const PER = { mes: ['Este mês', (x) => mesChave(x.data) === mesAtual, (x) => mesChave(x.data) === mesDesloc(-1), 'mês passado'],
+    passado: ['Mês passado', (x) => mesChave(x.data) === mesDesloc(-1), (x) => mesChave(x.data) === mesDesloc(-2), 'mês retrasado'],
+    ano: ['Este ano', (x) => String(x.data).slice(0, 4) === ano, (x) => String(x.data).slice(0, 4) === String(+ano - 1) && String(x.data).slice(5, 10) <= h.slice(5, 10), 'mesmo período do ano passado'],
+    m12: ['Últimos 12 meses', (x) => mesChave(x.data) > mesDesloc(-12), (x) => mesChave(x.data) > mesDesloc(-24) && mesChave(x.data) <= mesDesloc(-12), '12 meses anteriores'] };
+  const [nomePer, noPer, noAnt, nomeAnt] = PER[f.fper];
+  const soma = (l, m = 'BRL') => l.filter((x) => x.moeda === m).reduce((s, x) => s + Number(x.valor || 0), 0);
+  const per = fat.filter(noPer), ant = fat.filter(noAnt);
+  const tot = soma(per), totAnt = soma(ant), outras = ['USD', 'EUR'].filter((m) => soma(per, m) > 0);
+  const varp = totAnt > 0 ? Math.round((tot - totAnt) / totAnt * 100) : null;
+  const ticket = per.filter((x) => x.moeda === 'BRL').length ? tot / per.filter((x) => x.moeda === 'BRL').length : 0;
+  const gastoMes = S.financeiro.filter((x) => x.ativo && x.moeda === 'BRL' && x.valor != null).reduce((s, x) => s + Number(x.valor) * FPORMES[x.recorrencia], 0);
+  const fatMes = soma(fat.filter((x) => mesChave(x.data) === mesAtual));
+  // 12 meses (R$)
+  const meses = Array.from({ length: 12 }, (_, i) => mesDesloc(i - 11)), porMes = meses.map((m) => soma(fat.filter((x) => mesChave(x.data) === m)));
+  const max = Math.max(...porMes, 1);
+  const W = 720, H = 220, bw = W / 12;
+  const barras = porMes.map((v, i) => { const hh = Math.round((v / max) * (H - 48)), x = i * bw + bw * 0.18, y = H - 26 - hh, [yy, mm] = meses[i].split('-');
+    return `<g class="${meses[i] === mesAtual ? 'atual' : ''}"><rect x="${x.toFixed(1)}" y="${y}" width="${(bw * 0.64).toFixed(1)}" height="${Math.max(hh, v > 0 ? 3 : 0)}" rx="5"><title>${MESES[+mm - 1]}/${yy}: ${finValor(v)}</title></rect>
+      ${v > 0 ? `<text x="${(x + bw * 0.32).toFixed(1)}" y="${y - 6}" class="vl">${v >= 1000 ? (v / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + 'k' : Math.round(v)}</text>` : ''}
+      <text x="${(x + bw * 0.32).toFixed(1)}" y="${H - 8}" class="mx">${MESES[+mm - 1]}</text></g>`; }).join('');
+  // por serviço no período
+  const porSv = {}; per.filter((x) => x.moeda === 'BRL').forEach((x) => { const k = x.servico || 'Sem serviço'; porSv[k] = (porSv[k] || 0) + Number(x.valor || 0); });
+  const svs = Object.entries(porSv).sort((a, b) => b[1] - a[1]), svMax = svs[0]?.[1] || 1;
+  const temStripe = fat.some((x) => x.origem === 'stripe');
+  el.innerHTML = `<div class="filtros"><div class="seg">${Object.entries(PER).map(([k, [n]]) => `<button data-fp="${k}" class="${f.fper === k ? 'ativo' : ''}">${n}</button>`).join('')}</div><button class="btn pri peq" id="bNovoFat" style="margin-left:auto">+ Registrar recebimento</button></div>
+    <div class="kpis">
+      <div class="cartao kpi destaque"><small>Faturado · ${nomePer.toLowerCase()}</small><b>${finValor(tot)}</b>${outras.map((m) => `<small>+ ${finValor(soma(per, m), m)}</small>`).join('')}<small class="${varp == null ? '' : varp >= 0 ? 'sobe' : 'desce'}">${varp == null ? (totAnt === 0 && tot > 0 ? 'primeiro registro do período' : '&nbsp;') : `${varp >= 0 ? '▲' : '▼'} ${Math.abs(varp)}% vs ${nomeAnt}`}</small></div>
+      <div class="cartao kpi"><small>Recebimentos</small><b>${per.length}</b><small>no período</small></div>
+      <div class="cartao kpi"><small>Ticket médio</small><b style="font-size:21px">${finValor(ticket)}</b><small>por recebimento</small></div>
+      <div class="cartao kpi ${fatMes - gastoMes < 0 ? 'alerta' : ''}"><small>Sobra estimada do mês</small><b style="font-size:21px">${finValor(fatMes - gastoMes)}</b><small>faturado no mês − contas fixas</small></div>
+    </div>
+    <div class="grade-fat">
+      <div class="cartao grafico"><div class="cab"><h3>Faturamento por mês</h3><small class="muted">últimos 12 meses · R$</small></div><div class="grafico-sc"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Faturamento dos últimos 12 meses">${barras}</svg></div></div>
+      <div class="cartao"><div class="cab"><h3>Por serviço</h3><small class="muted">${nomePer.toLowerCase()}</small></div><div class="svs">${svs.map(([k, v]) => `<div class="sv-l"><div class="sv-t"><span>${esc(k)}</span><b>${finValor(v)}</b></div><div class="sv-b"><i style="width:${Math.max(4, v / svMax * 100).toFixed(1)}%"></i></div></div>`).join('') || '<p class="vazio">Nenhum recebimento no período.</p>'}</div></div>
+    </div>
+    <div class="cartao" style="margin-top:14px"><div class="cab"><h3>Recebimentos · ${nomePer.toLowerCase()}</h3></div><div class="lista-itens" id="fatL"></div></div>
+    <p class="muted peq" style="margin-top:10px">${temStripe ? '⚡ Pagamentos feitos pelos links da Stripe entram aqui sozinhos.' : 'Pagamentos pelos links da Stripe entram aqui sozinhos depois de ligar a Stripe ao CRM (passo a passo no LEIA-ME). Pix, transferência e dinheiro você registra no botão “+ Registrar recebimento”.'}</p>`;
+  modoFinanceiro(el);
+  const gs = $('.grafico-sc', el); if (gs) requestAnimationFrame(() => (gs.scrollLeft = gs.scrollWidth));
+  $$('[data-fp]', el).forEach((b) => (b.onclick = () => { f.fper = b.dataset.fp; render(); }));
+  $('#bNovoFat').onclick = () => editarFaturamento({});
+  const lista = per.slice().sort((a, b) => String(b.data).localeCompare(String(a.data)) || String(b.criado_em).localeCompare(String(a.criado_em)));
+  $('#fatL').innerHTML = lista.map((x) => `<div data-fat="${x.id}" class="fi-linha"><div style="flex:1;min-width:0"><div style="font-weight:600">${esc(x.servico || 'Recebimento')}${x.cliente ? ` <span class="muted" style="font-weight:500">· ${esc(x.cliente)}</span>` : ''}</div>
+      <div class="rapidos" style="margin-top:5px"><span class="chip">📅 ${new Date(String(x.data).slice(0, 10) + 'T12:00:00').toLocaleDateString('pt-BR')}</span><span class="chip ${x.origem === 'stripe' ? 'stripe' : ''}">${x.origem === 'stripe' ? '⚡ Stripe' : '✍️ Manual'}</span>${x.forma && x.origem !== 'stripe' ? `<span class="chip">${esc(x.forma)}</span>` : ''}${x.unidade && S.unidade === 'todas' ? `<span class="ponto" title="${esc(unidade(x.unidade).nome)}" style="background:${esc(unidade(x.unidade).cor)}"></span>` : ''}</div></div>
+      <div class="fi-acao"><b class="positivo">+ ${finValor(x.valor, x.moeda)}</b></div></div>`).join('') || '<p class="vazio">Nenhum recebimento no período. Toque em “+ Registrar recebimento” para lançar o primeiro.</p>';
+  $$('#fatL [data-fat]').forEach((d) => (d.onclick = () => editarFaturamento(S.faturamento.find((y) => y.id === d.dataset.fat))));
+}
+function editarFaturamento(x0) {
+  const x = { data: hoje(), moeda: 'BRL', origem: 'manual', forma: 'Pix', unidade: S.unidade !== 'todas' ? S.unidade : null, ...x0 }, novo = !x.id, stripe = x.origem === 'stripe';
+  const { v, fechar } = abrirVeu(`<div class="modal"><header><h3>${novo ? 'Registrar recebimento' : stripe ? 'Recebimento pela Stripe' : 'Recebimento'}</h3><button class="x" aria-label="Fechar">×</button></header>
+    <form class="miolo" id="fFat">
+      ${stripe ? '<p class="muted peq" style="margin:0">⚡ Lançado automaticamente pela Stripe. Você pode ajustar serviço, cliente e anotações.</p>' : ''}
+      <div class="grade g3"><div><label class="rot">Valor *</label><input class="campo" name="valor" inputmode="decimal" required value="${x.valor != null ? String(x.valor).replace('.', ',') : ''}" placeholder="0,00" ${stripe ? 'readonly' : ''}></div>
+        <div><label class="rot">Moeda</label><select class="campo" name="moeda" ${stripe ? 'disabled' : ''}>${opcoes({ BRL: 'R$ (Real)', USD: 'US$ (Dólar)', EUR: '€ (Euro)' }, x.moeda)}</select></div>
+        <div><label class="rot">Data *</label><input class="campo" type="date" name="data" required value="${esc(String(x.data).slice(0, 10))}"></div></div>
+      <div class="grade g2"><div><label class="rot">Serviço</label><input class="campo" name="servico" list="fSv" maxlength="120" value="${esc(x.servico || '')}" placeholder="Ex.: Site"><datalist id="fSv">${SERVICOS_FAT.map((s) => `<option value="${esc(s)}">`).join('')}</datalist></div>
+        <div><label class="rot">Cliente</label><input class="campo" name="cliente" maxlength="160" value="${esc(x.cliente || '')}" list="fCli"><datalist id="fCli">${S.contatos.filter((c) => !c.arquivado).slice(0, 300).map((c) => `<option value="${esc(c.empresa || c.nome)}">`).join('')}</datalist></div></div>
+      <div class="grade g2"><div><label class="rot">Forma</label><input class="campo" name="forma" list="fFo" maxlength="60" value="${esc(x.forma || '')}"><datalist id="fFo">${FORMAS_FAT.map((s) => `<option value="${esc(s)}">`).join('')}</datalist></div>
+        <div><label class="rot">Unidade</label><select class="campo" name="unidade"><option value="">—</option>${opUnid(x.unidade)}</select></div></div>
+      <div><label class="rot">Anotações</label><textarea class="campo" name="nota" rows="2" maxlength="1000">${esc(x.nota || '')}</textarea></div>
+      <footer style="padding:0;border:0">${novo ? '' : '<button type="button" class="btn perigo" id="fatApagar" style="margin-right:auto">Apagar</button>'}<button type="button" class="btn" data-fechar>Cancelar</button><button class="btn pri">Salvar</button></footer></form></div>`, true);
+  if (novo) $('[name=valor]', v).focus();
+  $('#fatApagar', v)?.addEventListener('click', async () => { if (!confirm('Apagar este recebimento?')) return; try { await A.apagar('faturamento', x.id); S.faturamento = S.faturamento.filter((y) => y.id !== x.id); fechar(); render(); toast('Recebimento apagado'); } catch (e) { falha(e); } });
+  $('#fFat', v).onsubmit = async (e) => { e.preventDefault(); const fd = new FormData(e.target), d = {};
+    ['data', 'servico', 'cliente', 'forma', 'unidade', 'nota'].forEach((k) => (d[k] = (fd.get(k) || '').trim() || null)); if (d.unidade === '__nova__') d.unidade = null;
+    if (!stripe) { d.moeda = fd.get('moeda') || 'BRL'; const val = (fd.get('valor') || '').trim(); d.valor = Number(val.includes(',') ? val.replace(/\./g, '').replace(',', '.') : val); if (!val || !isFinite(d.valor) || d.valor < 0) return toast('Valor inválido', 'erro'); }
+    try { await salvar('faturamento', novo ? { ...d, origem: 'manual' } : { id: x.id, ...d }, novo ? 'Recebimento registrado 💰' : 'Recebimento salvo'); fechar(); render(); } catch {} };
 }
 
 // ---------- formulários (tabelas tipo planilha; senhas criptografadas) ----------

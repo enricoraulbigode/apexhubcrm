@@ -112,7 +112,15 @@
       { id: 'fi-1', nome: 'Exemplo · Domínio rotastudioai.com', categoria: 'assinatura', valor: 59.99, moeda: 'BRL', vencimento: dia(2), recorrencia: 'anual', avisar_dias: 7, forma: 'Cartão', ativo: true, criado_por: 'enrico', criado_em: ag, atualizado_em: ag },
       { id: 'fi-2', nome: 'Exemplo · Ferramenta de design', categoria: 'ferramenta', valor: 20, moeda: 'USD', vencimento: dia(12), recorrencia: 'mensal', avisar_dias: 3, forma: 'Cartão', ativo: true, criado_por: 'enrico', criado_em: ag, atualizado_em: ag },
       { id: 'fi-3', nome: 'Exemplo · Internet', categoria: 'conta', valor: 120, moeda: 'BRL', vencimento: dia(-1), recorrencia: 'mensal', avisar_dias: 3, forma: 'Pix', ativo: true, criado_por: 'enrico', criado_em: ag, atualizado_em: ag }]; }
-  function demo() { if (memoria) return memoria; let d = null; try { d = JSON.parse(local.get(DEMO) || 'null'); } catch {} if (!d) { d = semente(); local.set(DEMO, JSON.stringify(d)); } d.pastas = d.pastas || []; d.arquivos = d.arquivos || []; d.objetivos = d.objetivos || []; if (!d.financeiro) d.financeiro = finDemo(); if (!d.modelos) d.modelos = semente().modelos; if (!d.planos) { const sm = semente(); Object.assign(d, { planos: sm.planos, lembretes: sm.lembretes, planilhas: sm.planilhas, planilha_linhas: sm.planilha_linhas }); } return (memoria = d); }
+  function ideiasDemo() { const ag = agoraISO();
+    return [
+      { id: 'id-1', titulo: 'Exemplo · Pacote site + social media com desconto', descricao: 'Oferecer para quem fechar site junto com o plano Pro.', status: 'nova', potencial: 'alto', categoria: 'Oferta', ordem: 3, criado_por: 'enrico', criado_em: ag, atualizado_em: ag },
+      { id: 'id-2', titulo: 'Exemplo · Série de reels mostrando bastidores dos sistemas', status: 'analisando', potencial: 'normal', categoria: 'Conteúdo', ordem: 2, criado_por: 'enrico', criado_em: ag, atualizado_em: ag },
+      { id: 'id-3', titulo: 'Exemplo · Modelo pronto de sistema para barbearias', status: 'aprovada', potencial: 'alto', categoria: 'Produto', ordem: 1, criado_por: 'enrico', criado_em: ag, atualizado_em: ag }]; }
+  function fatDemo() { const ag = agoraISO(); const mes = (m, d) => { const x = new Date(); x.setDate(1); x.setMonth(x.getMonth() - m); x.setDate(d); return x.toISOString().slice(0, 10); };
+    return [[0, 4, 1497, 'Social media · Pro', 'stripe'], [0, 2, 700, 'Site', 'manual'], [1, 20, 1200, 'Sistema', 'stripe'], [1, 9, 900, 'Social media · Essencial', 'stripe'], [2, 15, 700, 'Site', 'manual'], [3, 6, 1200, 'Sistema', 'manual']]
+      .map(([m, d, v, sv, o], i) => ({ id: 'fat-' + i, data: mes(m, d), valor: v, moeda: 'BRL', servico: sv, cliente: 'Cliente exemplo ' + (i + 1), origem: o, criado_por: 'enrico', criado_em: ag, atualizado_em: ag })); }
+  function demo() { if (memoria) return memoria; let d = null; try { d = JSON.parse(local.get(DEMO) || 'null'); } catch {} if (!d) { d = semente(); local.set(DEMO, JSON.stringify(d)); } d.pastas = d.pastas || []; d.arquivos = d.arquivos || []; d.objetivos = d.objetivos || []; if (!d.financeiro) d.financeiro = finDemo(); if (!d.ideias) d.ideias = ideiasDemo(); if (!d.faturamento) d.faturamento = fatDemo(); if (!d.modelos) d.modelos = semente().modelos; if (!d.planos) { const sm = semente(); Object.assign(d, { planos: sm.planos, lembretes: sm.lembretes, planilhas: sm.planilhas, planilha_linhas: sm.planilha_linhas }); } return (memoria = d); }
   const salvarDemo = (d) => { memoria = d; local.set(DEMO, JSON.stringify(d)); };
   const ROT = { novo: 'Novo', em_contato: 'Em contato', proposta: 'Proposta enviada', negociacao: 'Negociação', fechado: 'Fechado', perdido: 'Perdido' };
 
@@ -140,7 +148,7 @@
       }
     }
     if (tabela === 'projetos') depois.atualizado_em = agora;
-    if (['planos', 'lembretes', 'planilhas', 'planilha_linhas', 'financeiro'].includes(tabela)) { if (!antes) depois.criado_por = eu; depois.atualizado_em = agora; if (tabela === 'lembretes' && antes && antes.quando !== depois.quando) depois.enviado_em = null; }
+    if (['planos', 'lembretes', 'planilhas', 'planilha_linhas', 'financeiro', 'ideias', 'faturamento'].includes(tabela)) { if (!antes) depois.criado_por = eu; depois.atualizado_em = agora; if (tabela === 'lembretes' && antes && antes.quando !== depois.quando) depois.enviado_em = null; }
     if (tabela === 'pastas' || tabela === 'arquivos') {
       if (!antes) { depois.criado_por = eu; depois.status = depois.status || 'pendente'; }
       if (depois.status === 'feito' && (!antes || antes.status !== 'feito')) { depois.feito_por = eu; depois.feito_em = agora; }
@@ -166,9 +174,9 @@
   async function novaSenha(s) { if (!REAL) return; const c = await cliente(); const { error } = await c.auth.updateUser({ password: s }); if (error) throw error; }
 
   // ================= dados =================
-  const TABELAS = ['equipe', 'unidades', 'contatos', 'tarefas', 'projetos', 'emails', 'pastas', 'arquivos', 'modelos', 'planos', 'lembretes', 'planilhas', 'objetivos', 'financeiro'];
+  const TABELAS = ['equipe', 'unidades', 'contatos', 'tarefas', 'projetos', 'emails', 'pastas', 'arquivos', 'modelos', 'planos', 'lembretes', 'planilhas', 'objetivos', 'financeiro', 'ideias', 'faturamento'];
   async function carregar() {
-    if (!REAL) { await espera(150); const d = demo(); return { eu: d.eu, equipe: d.equipe, unidades: d.unidades, contatos: d.contatos, tarefas: d.tarefas, projetos: d.projetos, emails: d.emails.slice().sort((a, b) => (a.data < b.data ? 1 : -1)), pastas: d.pastas || [], arquivos: d.arquivos || [], modelos: d.modelos || [], planos: d.planos || [], lembretes: d.lembretes || [], planilhas: d.planilhas || [], objetivos: d.objetivos || [], financeiro: d.financeiro || [] }; }
+    if (!REAL) { await espera(150); const d = demo(); return { eu: d.eu, equipe: d.equipe, unidades: d.unidades, contatos: d.contatos, tarefas: d.tarefas, projetos: d.projetos, emails: d.emails.slice().sort((a, b) => (a.data < b.data ? 1 : -1)), pastas: d.pastas || [], arquivos: d.arquivos || [], modelos: d.modelos || [], planos: d.planos || [], lembretes: d.lembretes || [], planilhas: d.planilhas || [], objetivos: d.objetivos || [], financeiro: d.financeiro || [], ideias: d.ideias || [], faturamento: d.faturamento || [] }; }
     const c = await cliente();
     const { data: eu, error: e0 } = await c.rpc('eu'); if (e0) throw e0; if (!eu) falhar('sem_acesso');
     const pedidos = await Promise.all([
@@ -184,9 +192,11 @@
       c.from('planilhas').select('*').order('nome').limit(300),
       c.from('objetivos').select('*').order('prazo').limit(500),
       c.from('financeiro').select('*').order('vencimento').limit(1000),
+      c.from('ideias').select('*').order('ordem', { ascending: false }).limit(2000),
+      c.from('faturamento').select('*').order('data', { ascending: false }).limit(5000),
     ]);
     const out = { eu };
-    const novas = ['planos', 'lembretes', 'planilhas', 'objetivos', 'financeiro']; // se o banco ainda não foi atualizado, o resto do CRM continua funcionando
+    const novas = ['planos', 'lembretes', 'planilhas', 'objetivos', 'financeiro', 'ideias', 'faturamento']; // se o banco ainda não foi atualizado, o resto do CRM continua funcionando
     pedidos.forEach((r, i) => { if (r.error) { if (novas.includes(TABELAS[i])) { console.warn('tabela ainda não criada:', TABELAS[i]); out[TABELAS[i]] = []; return; } throw r.error; } out[TABELAS[i]] = r.data || []; });
     return out;
   }
@@ -241,7 +251,7 @@
     if (!REAL) return () => {};
     const c = await cliente();
     const canal = c.channel('crm');
-    ['contatos', 'tarefas', 'emails', 'pastas', 'arquivos', 'planos', 'lembretes', 'planilhas', 'financeiro'].forEach((t) => canal.on('postgres_changes', { event: '*', schema: 'public', table: t }, (ev) => cb(t, ev.eventType, ev.new || {})));
+    ['contatos', 'tarefas', 'emails', 'pastas', 'arquivos', 'planos', 'lembretes', 'planilhas', 'financeiro', 'ideias', 'faturamento'].forEach((t) => canal.on('postgres_changes', { event: '*', schema: 'public', table: t }, (ev) => cb(t, ev.eventType, ev.new || {})));
     canal.subscribe();
     return () => c.removeChannel(canal);
   }
